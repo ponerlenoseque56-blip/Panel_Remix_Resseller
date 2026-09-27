@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TvOnline Panel - Modo Mayorista</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #18181c;
+            --card-border: #2a2a30;
+            --primary-purple: #7000ff;
+            --accent-pink: #d900ff;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            min-height: 100vh;
+            padding: 20px 16px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .brand span { color: #00a2ff; font-style: normal; font-size: 14px; }
+
+        /* Selector de Rol para el Profesor */
+        .role-selector-container {
+            background: #1f1f26;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #3a3a45;
+            font-size: 12px;
+        }
+        .role-selector-container select {
+            background: transparent;
+            color: var(--accent-pink);
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Balance Card */
+        .balance-card {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .balance-title { font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
+        .balance-amount { font-size: 36px; font-weight: bold; }
+
+        /* Quick Actions Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink));
+            border: none;
+            border-radius: 12px;
+            padding: 14px 8px;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Sections / List Cards */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover { border-color: var(--accent-pink); }
+
+        .card-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title { font-size: 15px; font-weight: 600; }
+        .card-subtitle { font-size: 12px; color: var(--text-muted); }
+
+        .add-btn {
+            background: #25252e;
+            border: 1px solid #404050;
+            color: white;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Modal simple para crear usuarios */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .modal-content input {
+            padding: 8px;
+            background: #0d0d0d;
+            border: 1px solid var(--card-border);
+            color: white;
+            border-radius: 6px;
+        }
+        .modal-content button {
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="brand">TvOnline <span>Panel</span></div>
+        <div class="role-selector-container">
+            <label>Rol actual:</label>
+            <select id="roleSelect" onchange="changeRole()">
+                <option value="mayorista" selected>Mayorista</option>
+                <option value="revendedor">Revendedor</option>
+                <option value="minorista">Minorista</option>
+                <option value="vendedor">Vendedor</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Balance Section -->
+    <div class="balance-card">
+        <div class="balance-title">Total balance 👁️</div>
+        <div class="balance-amount" id="balanceDisplay">8,00</div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions-grid">
+        <button class="btn-action" onclick="alert('Sección Depositar Saldo')">
+            <span>⬆️</span> Depositar
+        </button>
+        <button class="btn-action" onclick="openModal('Enviar Créditos')">
+            <span>🔄</span> Enviar
+        </button>
+        <button class="btn-action" onclick="alert('Carga de código/voucher')">
+            <span>📅</span> Cargar
+        </button>
+    </div>
+
+    <!-- Direct Client Card -->
+    <div class="card">
+        <div class="card-info">
+            <span>👤</span>
+            <div>
+                <div class="card-title">Clientes</div>
+                <div class="card-subtitle" id="clientCount">12 - total</div>
+            </div>
+        </div>
+        <div class="add-btn" onclick="openModal('Crear Cliente Final')">+</div>
+    </div>
+
+    <!-- Hierarchy Section -->
+    <div style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">SUB-CUENTAS / JERARQUÍA</div>
+
+    <!-- Roles / Sub-cuentas -->
+    <div class="card role-card" id="card-vendedor" onclick="viewUsers('Vendedor')">
+        <div class="card-info">
+            <span>🛍️</span>
+            <div class="card-title" style="color: var(--accent-pink);">Vendedor</div>
+        </div>
+        <div class="add-btn" onclick="event.stopPropagation(); openModal('Crear Vendedor')">+</div>
+    </div>
+
+    <div class="card role-card" id="card-revendedor" onclick="viewUsers('Revendedor')">
+        <div class="card-info">
+            <span>💼</span>
+            <div class="card-title">Revendedor</div>
+        </div>
+        <div class="add-btn" onclick="event.stopPropagation(); openModal('Crear Revendedor')">+</div>
+    </div>
+
+    <div class="card role-card" id="card-minorista" onclick="viewUsers('Minorista')">
+        <div class="card-info">
+            <span>🛒</span>
+            <div class="card-title">Minorista</div>
+        </div>
+        <div class="add-btn" onclick="event.stopPropagation(); openModal('Crear Minorista')">+</div>
+    </div>
+
+    <div class="card role-card" id="card-mayorista" onclick="viewUsers('Mayorista')">
+        <div class="card-info">
+            <span>🚚</span>
+            <div class="card-title">Mayorista</div>
+        </div>
+        <div class="add-btn" onclick="event.stopPropagation(); openModal('Crear Mayorista')">+</div>
+    </div>
+</div>
+
+<!-- Modal Genérico para pruebas -->
+<div class="modal" id="actionModal">
+    <div class="modal-content">
+        <h4 id="modalTitle" style="margin:0">Acción</h4>
+        <input type="text" placeholder="Nombre de usuario" id="inputUser">
+        <input type="number" placeholder="Créditos/Saldo inicial" id="inputCredits">
+        <button onclick="submitModal()">Guardar / Activar</button>
+        <button onclick="closeModal()" style="background: #333;">Cancelar</button>
+    </div>
+</div>
+
+<script>
+    function changeRole() {
+        const role = document.getElementById('roleSelect').value;
+        const cards = {
+            vendedor: document.getElementById('card-vendedor'),
+            revendedor: document.getElementById('card-revendedor'),
+            minorista: document.getElementById('card-minorista'),
+            mayorista: document.getElementById('card-mayorista')
+        };
+
+        if (role === 'mayorista') {
+            Object.values(cards).forEach(c => c.style.display = 'flex');
+        } else if (role === 'revendedor') {
+            cards.mayorista.style.display = 'none';
+            cards.revendedor.style.display = 'none';
+            cards.vendedor.style.display = 'flex';
+            cards.minorista.style.display = 'flex';
+        } else if (role === 'vendedor' || role === 'minorista') {
+            Object.values(cards).forEach(c => c.style.display = 'none');
+        }
+    }
+
+    function openModal(title) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('actionModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('actionModal').style.display = 'none';
+    }
+
+    function submitModal() {
+        alert('Acción ejecutada correctamente.');
+        closeModal();
+    }
+
+    function viewUsers(roleName) {
+        alert('Listando usuarios con el rol: ' + roleName);
+    }
+</script>
+
+</body>
+</html>
