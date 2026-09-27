@@ -101,7 +101,7 @@
         .toggle-password:hover { color: var(--primary-red); }
         .toggle-password svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-        /* ESTILO GENERAL DE BOTONES PRO */
+        /* BOTONES PRO */
         .btn-pro {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             padding: 12px 20px; background: linear-gradient(135deg, var(--primary-red), #a00000);
@@ -218,7 +218,7 @@
         }
         .btn-icon:hover { border-color: var(--primary-red); color: var(--primary-red); }
 
-        /* MODALES FLOTANTES */
+        /* MODALES */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
@@ -259,7 +259,7 @@
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="username">Usuario</label>
-                    <input type="text" id="username" class="form-control" placeholder="Nombre de usuario" required autocomplete="username">
+                    <input type="text" id="username" class="form-control" placeholder="admin o reseller" required autocomplete="username">
                 </div>
 
                 <div class="form-group">
@@ -294,7 +294,7 @@
                     <h2>REMIX <span>PANEL</span></h2>
                 </div>
                 <ul class="menu-list">
-                    <li class="menu-item active"><button onclick="switchTab('dash')"><i class="ph ph-squares-four"></i> Dashboard</button></li>
+                    <li class="menu-item active"><button><i class="ph ph-squares-four"></i> Dashboard</button></li>
                     <li class="menu-item"><button onclick="openModal('createModal')"><i class="ph ph-user-plus"></i> Crear Cliente</button></li>
                     <li class="menu-item"><button onclick="generateDemo()"><i class="ph ph-clock"></i> Demo Rápido</button></li>
                     <li class="menu-item"><button onclick="openModal('creditsModal')"><i class="ph ph-coins"></i> Mis Créditos</button></li>
@@ -309,7 +309,7 @@
                         <p style="font-size: 0.8rem; color: var(--text-muted);">Administración Remix Panel</p>
                     </div>
                     <div class="user-info">
-                        <span id="userBadge" class="badge-role">Administrador</span>
+                        <span id="userBadge" class="badge-role">Mayorista</span>
                         <button class="btn-pro btn-secondary" onclick="logout()"><i class="ph ph-sign-out"></i> Salir</button>
                     </div>
                 </header>
@@ -319,14 +319,14 @@
                         <div class="stat-card">
                             <div class="stat-info">
                                 <h4>Créditos</h4>
-                                <div class="number" id="statCredits" style="color: var(--primary-red);">150</div>
+                                <div class="number" id="statCredits" style="color: var(--primary-red);">9999</div>
                             </div>
                             <div class="stat-icon"><i class="ph ph-coins"></i></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-info">
                                 <h4>Clientes Activos</h4>
-                                <div class="number" id="statActive">2</div>
+                                <div class="number" id="statActive">1</div>
                             </div>
                             <div class="stat-icon"><i class="ph ph-users"></i></div>
                         </div>
@@ -360,7 +360,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="clientsTableBody">
-                                    <!-- Datos dinámicos -->
+                                    <!-- Carga dinámica -->
                                 </tbody>
                             </table>
                         </div>
@@ -407,9 +407,9 @@
                 <button class="btn-close-modal" onclick="closeModal('creditsModal')">&times;</button>
             </div>
             <i class="ph ph-coins" style="font-size: 3.5rem; color: var(--primary-red);"></i>
-            <h2 style="font-size: 2.2rem; margin: 10px 0;" id="modalCreditsCount">150</h2>
+            <h2 style="font-size: 2.2rem; margin: 10px 0;" id="modalCreditsCount">9999</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem;">Créditos disponibles en tu saldo.</p>
-            <button class="btn-pro btn-block" style="margin-top: 20px;" onclick="alert('Solicitud enviada al proveedor.')">Comprar Mas Créditos</button>
+            <button class="btn-pro btn-block" style="margin-top: 20px;" onclick="alert('Solicitud enviada.')">Comprar Más Créditos</button>
         </div>
     </div>
 
@@ -428,20 +428,23 @@
         </div>
     </div>
 
+    <!-- AQUÍ ESTÁ TODO EL CÓDIGO JAVASCRIPT INTEGRADO -->
     <script>
-        // Base de Datos en memoria
+        // Cuentas registradas
         const usersDatabase = {
-            'admin': { password: 'admin123', role: 'Administrador' },
+            'admin': { password: 'admin123', role: 'Mayorista' },
             'reseller': { password: 'reseller123', role: 'Revendedor' }
         };
 
-        let currentCredits = 150;
+        let activeUser = 'admin';
+        let currentCredits = 9999;
+
         let clientsList = [
             { user: 'juan_perez', pass: '441029', plan: '1 Mes', status: 'ACTIVO', expires: '27/10/2026' },
             { user: 'demo_9821', pass: '110293', plan: 'Demo 2Hs', status: 'DEMO', expires: 'Hoy, 19:00 HS' }
         ];
 
-        // Función renderizar tabla
+        // Dibujar clientes en pantalla
         function renderTable() {
             const tbody = document.getElementById('clientsTableBody');
             tbody.innerHTML = '';
@@ -471,7 +474,7 @@
             document.getElementById('statDemos').innerText = clientsList.filter(c => c.status === 'DEMO').length;
         }
 
-        // Toggle Mostrar Contraseña
+        // Ocultar/Ver Contraseña
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const eyeOpen = document.getElementById('eyeOpen');
@@ -488,7 +491,7 @@
             }
         }
 
-        // Manejo Login
+        // Proceso de Inicio de Sesión según Rol
         function handleLogin(event) {
             event.preventDefault();
             const usernameInput = document.getElementById('username').value.trim();
@@ -498,9 +501,19 @@
             errorMessage.style.display = 'none';
 
             if (usersDatabase[usernameInput] && usersDatabase[usernameInput].password === passwordInput) {
+                activeUser = usernameInput;
+                const userRole = usersDatabase[usernameInput].role;
+
+                // Asignación de Créditos según el Tipo de Cuenta
+                if (userRole === 'Mayorista') {
+                    currentCredits = 9999; // Créditos para Mayoristas
+                } else {
+                    currentCredits = 50;   // Créditos iniciales para Revendedor
+                }
+
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboardScreen').style.display = 'block';
-                document.getElementById('userBadge').innerText = usersDatabase[usernameInput].role;
+                document.getElementById('userBadge').innerText = userRole;
                 document.getElementById('welcomeHeader').innerText = `¡Bienvenido, ${usernameInput}!`;
                 renderTable();
             } else {
@@ -508,14 +521,14 @@
             }
         }
 
-        // Logout
+        // Salir de la Cuenta
         function logout() {
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('dashboardScreen').style.display = 'none';
             document.getElementById('password').value = '';
         }
 
-        // Modales
+        // Control de Ventanas Flotantes
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -562,11 +575,11 @@
             }
         }
 
-        // Guardar Ajustes
+        // Guardar Nueva Contraseña
         function saveSettings() {
             const newP = document.getElementById('changePass').value;
             if(newP) {
-                usersDatabase['admin'].password = newP;
+                usersDatabase[activeUser].password = newP;
                 alert('¡Contraseña actualizada correctamente!');
                 closeModal('settingsModal');
             }
