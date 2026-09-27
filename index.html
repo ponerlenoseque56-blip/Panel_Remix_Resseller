@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TvOnline Panel - Modo Mayorista</title>
+    <title>TvOnline Panel - Autenticación y Gestión</title>
     <style>
         :root {
             --bg-color: #0d0d0d;
@@ -23,6 +23,8 @@
             color: var(--text-main);
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         .mobile-container {
@@ -36,42 +38,98 @@
             gap: 16px;
         }
 
-        /* Header */
+        /* Vistas */
+        #loginView {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            max-width: 360px;
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-sizing: border-box;
+        }
+
+        #panelView {
+            display: none;
+            width: 100%;
+        }
+
+        .brand-title {
+            font-size: 26px;
+            font-weight: bold;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .brand-title span { color: #00a2ff; font-style: normal; font-size: 16px; }
+
+        /* Estilos de Formulario */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px;
+            background: #0d0d0d;
+            border: 1px solid var(--card-border);
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink));
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+        /* Header del Panel */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .brand {
-            font-size: 20px;
-            font-weight: bold;
-            font-style: italic;
-        }
-        .brand span { color: #00a2ff; font-style: normal; font-size: 14px; }
-
-        /* Selector de Rol para el Profesor */
-        .role-selector-container {
+        .user-badge {
             background: #1f1f26;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
             border: 1px solid #3a3a45;
             font-size: 12px;
-        }
-        .role-selector-container select {
-            background: transparent;
             color: var(--accent-pink);
-            border: none;
             font-weight: bold;
+        }
+
+        .btn-logout {
+            background: #2a2a30;
+            color: var(--text-muted);
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
             cursor: pointer;
-            outline: none;
         }
 
         /* Balance Card */
-        .balance-card {
-            text-align: center;
-            padding: 10px 0;
-        }
+        .balance-card { text-align: center; padding: 10px 0; }
         .balance-title { font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
         .balance-amount { font-size: 36px; font-weight: bold; }
 
@@ -97,7 +155,7 @@
             font-size: 13px;
         }
 
-        /* Sections / List Cards */
+        /* List Cards */
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -106,18 +164,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
-            transition: border-color 0.2s;
+            margin-top: 10px;
         }
 
-        .card:hover { border-color: var(--accent-pink); }
-
-        .card-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .card-info { display: flex; align-items: center; gap: 12px; }
         .card-title { font-size: 15px; font-weight: 600; }
         .card-subtitle { font-size: 12px; color: var(--text-muted); }
 
@@ -132,179 +182,185 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            cursor: pointer;
         }
 
-        /* Modal simple para crear usuarios */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            width: 80%;
-            max-width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .modal-content input {
-            padding: 8px;
-            background: #0d0d0d;
-            border: 1px solid var(--card-border);
-            color: white;
-            border-radius: 6px;
-        }
-        .modal-content button {
-            background: var(--primary-purple);
-            color: white;
-            border: none;
+        /* Info demo credentials */
+        .demo-info {
+            margin-top: 15px;
             padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
+            background: #151518;
+            border-radius: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
         }
     </style>
 </head>
 <body>
 
-<div class="mobile-container">
-    <!-- Header -->
-    <div class="header">
-        <div class="brand">TvOnline <span>Panel</span></div>
-        <div class="role-selector-container">
-            <label>Rol actual:</label>
-            <select id="roleSelect" onchange="changeRole()">
-                <option value="mayorista" selected>Mayorista</option>
-                <option value="revendedor">Revendedor</option>
-                <option value="minorista">Minorista</option>
-                <option value="vendedor">Vendedor</option>
-            </select>
+<!-- PANTALLA DE LOGIN -->
+<div id="loginView">
+    <div class="brand-title">TvOnline <span>Panel</span></div>
+    
+    <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" id="username" placeholder="Ej: mayorista1" required>
         </div>
-    </div>
-
-    <!-- Balance Section -->
-    <div class="balance-card">
-        <div class="balance-title">Total balance 👁️</div>
-        <div class="balance-amount" id="balanceDisplay">8,00</div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="actions-grid">
-        <button class="btn-action" onclick="alert('Sección Depositar Saldo')">
-            <span>⬆️</span> Depositar
-        </button>
-        <button class="btn-action" onclick="openModal('Enviar Créditos')">
-            <span>🔄</span> Enviar
-        </button>
-        <button class="btn-action" onclick="alert('Carga de código/voucher')">
-            <span>📅</span> Cargar
-        </button>
-    </div>
-
-    <!-- Direct Client Card -->
-    <div class="card">
-        <div class="card-info">
-            <span>👤</span>
-            <div>
-                <div class="card-title">Clientes</div>
-                <div class="card-subtitle" id="clientCount">12 - total</div>
-            </div>
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="password" placeholder="••••••••" required>
         </div>
-        <div class="add-btn" onclick="openModal('Crear Cliente Final')">+</div>
-    </div>
+        <button type="submit" class="btn-primary">Iniciar Sesión</button>
+    </form>
 
-    <!-- Hierarchy Section -->
-    <div style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">SUB-CUENTAS / JERARQUÍA</div>
-
-    <!-- Roles / Sub-cuentas -->
-    <div class="card role-card" id="card-vendedor" onclick="viewUsers('Vendedor')">
-        <div class="card-info">
-            <span>🛍️</span>
-            <div class="card-title" style="color: var(--accent-pink);">Vendedor</div>
-        </div>
-        <div class="add-btn" onclick="event.stopPropagation(); openModal('Crear Vendedor')">+</div>
-    </div>
-
-    <div class="card role-card" id="card-revendedor" onclick="viewUsers('Revendedor')">
-        <div class="card-info">
-            <span>💼</span>
-            <div class="card-title">Revendedor</div>
-        </div>
-        <div class="add-btn" onclick="event.stopPropagation(); openModal('Crear Revendedor')">+</div>
-    </div>
-
-    <div class="card role-card" id="card-minorista" onclick="viewUsers('Minorista')">
-        <div class="card-info">
-            <span>🛒</span>
-            <div class="card-title">Minorista</div>
-        </div>
-        <div class="add-btn" onclick="event.stopPropagation(); openModal('Crear Minorista')">+</div>
-    </div>
-
-    <div class="card role-card" id="card-mayorista" onclick="viewUsers('Mayorista')">
-        <div class="card-info">
-            <span>🚚</span>
-            <div class="card-title">Mayorista</div>
-        </div>
-        <div class="add-btn" onclick="event.stopPropagation(); openModal('Crear Mayorista')">+</div>
+    <div class="demo-info">
+        <strong>Acceso de prueba para el profesor:</strong><br>
+        • Mayorista: <code>mayorista</code> / <code>1234</code><br>
+        • Revendedor: <code>revendedor</code> / <code>1234</code><br>
+        • Vendedor: <code>vendedor</code> / <code>1234</code>
     </div>
 </div>
 
-<!-- Modal Genérico para pruebas -->
-<div class="modal" id="actionModal">
-    <div class="modal-content">
-        <h4 id="modalTitle" style="margin:0">Acción</h4>
-        <input type="text" placeholder="Nombre de usuario" id="inputUser">
-        <input type="number" placeholder="Créditos/Saldo inicial" id="inputCredits">
-        <button onclick="submitModal()">Guardar / Activar</button>
-        <button onclick="closeModal()" style="background: #333;">Cancelar</button>
+<!-- PANTALLA DEL PANEL GENERAL -->
+<div id="panelView">
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-title" style="margin:0; text-align:left;">TvOnline <span>Panel</span></div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span class="user-badge" id="roleBadge">Mayorista</span>
+                <button class="btn-logout" onclick="logout()">Salir</button>
+            </div>
+        </div>
+
+        <!-- Balance Section -->
+        <div class="balance-card">
+            <div class="balance-title">Total balance 👁️</div>
+            <div class="balance-amount" id="balanceDisplay">8,00</div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions-grid">
+            <button class="btn-action" onclick="alert('Sección Depositar Saldo')">
+                <span>⬆️</span> Depositar
+            </button>
+            <button class="btn-action" onclick="alert('Ventana para Enviar Créditos a sub-cuentas')">
+                <span>🔄</span> Enviar
+            </button>
+            <button class="btn-action" onclick="alert('Carga de código/voucher')">
+                <span>📅</span> Cargar
+            </button>
+        </div>
+
+        <!-- Direct Client Card -->
+        <div class="card">
+            <div class="card-info">
+                <span>👤</span>
+                <div>
+                    <div class="card-title">Clientes</div>
+                    <div class="card-subtitle">12 - total</div>
+                </div>
+            </div>
+            <div class="add-btn" onclick="alert('Crear Cliente Final')">+</div>
+        </div>
+
+        <!-- Hierarchy Section (Solo visible para Roles superiores) -->
+        <div id="hierarchySection">
+            <div style="font-size: 13px; color: var(--text-muted); margin-top: 16px;">SUB-CUENTAS / JERARQUÍA</div>
+
+            <div class="card" id="card-vendedor">
+                <div class="card-info">
+                    <span>🛍️</span>
+                    <div class="card-title" style="color: var(--accent-pink);">Vendedor</div>
+                </div>
+                <div class="add-btn" onclick="alert('Crear Vendedor')">+</div>
+            </div>
+
+            <div class="card" id="card-revendedor">
+                <div class="card-info">
+                    <span>💼</span>
+                    <div class="card-title">Revendedor</div>
+                </div>
+                <div class="add-btn" onclick="alert('Crear Revendedor')">+</div>
+            </div>
+
+            <div class="card" id="card-minorista">
+                <div class="card-info">
+                    <span>🛒</span>
+                    <div class="card-title">Minorista</div>
+                </div>
+                <div class="add-btn" onclick="alert('Crear Minorista')">+</div>
+            </div>
+
+            <div class="card" id="card-mayorista">
+                <div class="card-info">
+                    <span>🚚</span>
+                    <div class="card-title">Mayorista</div>
+                </div>
+                <div class="add-btn" onclick="alert('Crear Mayorista')">+</div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    function changeRole() {
-        const role = document.getElementById('roleSelect').value;
-        const cards = {
-            vendedor: document.getElementById('card-vendedor'),
-            revendedor: document.getElementById('card-revendedor'),
-            minorista: document.getElementById('card-minorista'),
-            mayorista: document.getElementById('card-mayorista')
-        };
+    // Lógica de inicio de sesión por credenciales
+    function handleLogin(e) {
+        e.preventDefault();
+        const user = document.getElementById('username').value.toLowerCase().trim();
+        const pass = document.getElementById('password').value.trim();
+
+        if (pass !== '1234') {
+            alert('Contraseña incorrecta. (Usar 1234 para pruebas)');
+            return;
+        }
+
+        let role = '';
+        if (user === 'mayorista') role = 'mayorista';
+        else if (user === 'revendedor') role = 'revendedor';
+        else if (user === 'vendedor' || user === 'minorista') role = 'vendedor';
+        else {
+            alert('Usuario no reconocido. Prueba con: mayorista, revendedor o vendedor.');
+            return;
+        }
+
+        // Mostrar Panel y Ocultar Login
+        document.getElementById('loginView').style.display = 'none';
+        document.getElementById('panelView').style.display = 'block';
+
+        // Configurar la interfaz según el rol que inició sesión
+        configureViewForRole(role);
+    }
+
+    function configureViewForRole(role) {
+        const badge = document.getElementById('roleBadge');
+        const hierarchy = document.getElementById('hierarchySection');
+        const cardMayorista = document.getElementById('card-mayorista');
+        const cardRevendedor = document.getElementById('card-revendedor');
+
+        badge.innerText = role.toUpperCase();
 
         if (role === 'mayorista') {
-            Object.values(cards).forEach(c => c.style.display = 'flex');
+            hierarchy.style.display = 'block';
+            cardMayorista.style.display = 'flex';
+            cardRevendedor.style.display = 'flex';
         } else if (role === 'revendedor') {
-            cards.mayorista.style.display = 'none';
-            cards.revendedor.style.display = 'none';
-            cards.vendedor.style.display = 'flex';
-            cards.minorista.style.display = 'flex';
-        } else if (role === 'vendedor' || role === 'minorista') {
-            Object.values(cards).forEach(c => c.style.display = 'none');
+            hierarchy.style.display = 'block';
+            cardMayorista.style.display = 'none';
+            cardRevendedor.style.display = 'none'; // Solo ve Vendedor y Minorista
+        } else {
+            // Vendedor / Minorista solo ven gestión de clientes finales
+            hierarchy.style.display = 'none';
         }
     }
 
-    function openModal(title) {
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('actionModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('actionModal').style.display = 'none';
-    }
-
-    function submitModal() {
-        alert('Acción ejecutada correctamente.');
-        closeModal();
-    }
-
-    function viewUsers(roleName) {
-        alert('Listando usuarios con el rol: ' + roleName);
+    function logout() {
+        document.getElementById('panelView').style.display = 'none';
+        document.getElementById('loginView').style.display = 'flex';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
     }
 </script>
 
