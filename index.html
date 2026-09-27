@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Streaming IPTV</title>
-    <!-- Estilos base e iconos -->
+    <title>Remix Panel - Acceso al Sistema</title>
     <style>
         :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --input-bg: #334155;
-            --border-color: #475569;
-            --error-color: #ef4444;
+            --bg-color: #050505;
+            --card-bg: #121212;
+            --input-bg: #1a1a1a;
+            --primary-red: #e50914;
+            --primary-red-hover: #ff1e27;
+            --text-color: #ffffff;
+            --text-muted: #8c8c8c;
+            --border-color: #2a2a2a;
+            --error-color: #ff4d4d;
+            --glow-red: rgba(229, 9, 20, 0.35);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
         }
 
         body {
@@ -33,44 +33,90 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(229, 9, 20, 0.12) 0%, transparent 60%);
         }
 
         .login-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 40px 32px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            max-width: 420px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8),
+                        0 0 20px var(--glow-red);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Línea superior roja con brillo */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+        }
+
+        /* Contenedor del Logo */
+        .logo-container {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 16px;
+            border-radius: 20px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 15px var(--glow-red);
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 18px;
         }
 
         .login-header h1 {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
             color: var(--text-color);
-            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .login-header h1 span {
+            color: var(--primary-red);
         }
 
         .login-header p {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
+            margin-top: 6px;
         }
 
         .form-group {
-            margin-bottom: 20px;
-            position: relative;
+            margin-bottom: 22px;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
+            font-weight: 600;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .input-container {
@@ -81,28 +127,29 @@
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 16px;
             background-color: var(--input-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             color: var(--text-color);
-            font-size: 1rem;
+            font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            border-color: var(--primary-color);
+            border-color: var(--primary-red);
+            box-shadow: 0 0 10px var(--glow-red);
         }
 
         .password-input {
-            padding-right: 45px;
+            padding-right: 48px;
         }
 
-        /* Botón estilo ojito */
+        /* Botón de Ojito */
         .toggle-password {
             position: absolute;
-            right: 12px;
+            right: 14px;
             background: none;
             border: none;
             color: var(--text-muted);
@@ -115,12 +162,12 @@
         }
 
         .toggle-password:hover {
-            color: var(--text-color);
+            color: var(--primary-red);
         }
 
         .toggle-password svg {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             fill: none;
             stroke: currentColor;
             stroke-width: 2;
@@ -130,28 +177,37 @@
 
         .btn-submit {
             width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-red), #b30000);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
             margin-top: 10px;
+            box-shadow: 0 4px 15px var(--glow-red);
         }
 
         .btn-submit:hover {
-            background-color: var(--primary-hover);
+            background: linear-gradient(135deg, var(--primary-red-hover), var(--primary-red));
+            box-shadow: 0 6px 20px rgba(255, 30, 39, 0.5);
+            transform: translateY(-1px);
         }
 
         .error-message {
             color: var(--error-color);
             font-size: 0.85rem;
-            margin-top: 15px;
+            margin-top: 16px;
             text-align: center;
             display: none;
+            background: rgba(255, 77, 77, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 77, 77, 0.2);
         }
     </style>
 </head>
@@ -159,8 +215,12 @@
 
     <div class="login-card">
         <div class="login-header">
-            <h1>Acceso al Panel</h1>
-            <p>Ingresa tus credenciales para continuar</p>
+            <div class="logo-container">
+                <!-- Tu logo ic_launcher.png (Asegúrate de tener la imagen en la misma carpeta) -->
+                <img src="ic_launcher.png" alt="Remix Panel Logo">
+            </div>
+            <h1>REMIX <span>PANEL</span></h1>
+            <p>Ingresa tus credenciales para acceder</p>
         </div>
 
         <form id="loginForm" onsubmit="handleLogin(event)">
@@ -174,12 +234,12 @@
                 <div class="input-container">
                     <input type="password" id="password" class="form-control password-input" placeholder="••••••••" required autocomplete="current-password">
                     <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" title="Mostrar/Ocultar contraseña">
-                        <!-- Icono de ojo abierto -->
+                        <!-- Ojito abierto -->
                         <svg id="eyeOpen" viewBox="0 0 24 24">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
-                        <!-- Icono de ojo tachado (oculto por defecto) -->
+                        <!-- Ojito tachado -->
                         <svg id="eyeClosed" viewBox="0 0 24 24" style="display: none;">
                             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                             <line x1="1" y1="1" x2="23" y2="23"></line>
@@ -194,13 +254,13 @@
     </div>
 
     <script>
-        // Credenciales predefinidas para la prueba
+        // Credenciales predefinidas
         const usersDatabase = {
             'admin': { password: 'admin123', role: 'Administrador' },
-            'reseller': { password: 'reseller123', role: 'Reseller' }
+            'reseller': { password: 'reseller123', role: 'Revendedor' }
         };
 
-        // Función para mostrar/ocultar contraseña
+        // Mostrar / Ocultar Contraseña
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const eyeOpen = document.getElementById('eyeOpen');
@@ -217,7 +277,7 @@
             }
         }
 
-        // Validación de Inicio de Sesión
+        // Validación de Login
         function handleLogin(event) {
             event.preventDefault();
             
@@ -227,11 +287,9 @@
 
             errorMessage.style.display = 'none';
 
-            // Comprobación de usuario y clave
             if (usersDatabase[usernameInput] && usersDatabase[usernameInput].password === passwordInput) {
                 const userRole = usersDatabase[usernameInput].role;
-                alert(`¡Bienvenido! Has ingresado correctamente como ${userRole}.`);
-                // Redirección al Dashboard según el rol (aquí puedes cargar tu vista principal)
+                alert(`¡Bienvenido a Remix Panel! Has ingresado como ${userRole}.`);
             } else {
                 errorMessage.style.display = 'block';
             }
