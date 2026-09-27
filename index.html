@@ -2,37 +2,39 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Remix Panel - Panel de Control</title>
     <!-- Iconos Phosphor -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         :root {
-            --bg-color: #08080c;
-            --card-bg: #111118;
-            --input-bg: #181824;
+            --bg-color: #050508;
+            --card-bg: #0f0f15;
+            --input-bg: #161622;
             --primary-red: #e50914;
             --primary-red-hover: #ff1e27;
             --text-color: #ffffff;
             --text-muted: #8e8ea0;
-            --border-color: #222230;
+            --border-color: #222232;
             --error-color: #ff4d4d;
             --success-color: #10b981;
             --warning-color: #f59e0b;
-            --glow-red: rgba(229, 9, 20, 0.35);
+            --glow-red: rgba(229, 9, 20, 0.4);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* --- LOGIN SCREEN --- */
@@ -42,235 +44,161 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            background-image: radial-gradient(circle at 50% 30%, rgba(229, 9, 20, 0.12) 0%, transparent 60%);
+            background-image: radial-gradient(circle at 50% 30%, rgba(229, 9, 20, 0.15) 0%, transparent 65%);
         }
 
         .login-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px 32px;
+            border-radius: 20px;
+            padding: 40px 28px;
             width: 100%;
-            max-width: 420px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px var(--glow-red);
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 25px var(--glow-red);
             position: relative;
-            overflow: hidden;
         }
 
         .login-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
+            top: 0; left: 0; right: 0; height: 3px;
             background: linear-gradient(90deg, transparent, var(--primary-red), transparent);
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
+        .login-header { text-align: center; margin-bottom: 30px; }
         .logo-container {
-            width: 85px;
-            height: 85px;
-            margin: 0 auto 16px;
-            border-radius: 20px;
-            background-color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 85px; height: 85px; margin: 0 auto 16px;
+            border-radius: 22px; background-color: #000;
+            display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--border-color);
             box-shadow: 0 0 15px var(--glow-red);
         }
-
-        .logo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 18px;
-        }
-
-        .login-header h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
+        .logo-container img { width: 100%; height: 100%; object-fit: contain; border-radius: 20px; }
+        .login-header h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
         .login-header h1 span { color: var(--primary-red); }
-        .login-header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; }
+        .login-header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
 
-        .form-group { margin-bottom: 22px; }
+        .form-group { margin-bottom: 20px; }
         .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
+            display: block; margin-bottom: 8px; font-size: 0.8rem;
+            font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
         }
 
         .input-container { position: relative; display: flex; align-items: center; }
-
         .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-color);
-            font-size: 0.95rem;
-            outline: none;
-            transition: all 0.3s ease;
+            width: 100%; padding: 14px 16px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: 12px;
+            color: var(--text-color); font-size: 0.95rem; outline: none; transition: all 0.3s ease;
         }
-
-        .form-control:focus {
-            border-color: var(--primary-red);
-            box-shadow: 0 0 10px var(--glow-red);
-        }
-
+        .form-control:focus { border-color: var(--primary-red); box-shadow: 0 0 12px var(--glow-red); }
         .password-input { padding-right: 48px; }
 
         .toggle-password {
-            position: absolute; right: 14px;
-            background: none; border: none;
-            color: var(--text-muted);
-            cursor: pointer; padding: 4px;
+            position: absolute; right: 14px; background: none; border: none;
+            color: var(--text-muted); cursor: pointer; padding: 4px;
             display: flex; align-items: center; justify-content: center;
         }
-
         .toggle-password:hover { color: var(--primary-red); }
         .toggle-password svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-        .btn-submit {
-            width: 100%; padding: 14px;
-            background: linear-gradient(135deg, var(--primary-red), #b30000);
-            color: white; border: none; border-radius: 10px;
-            font-size: 1rem; font-weight: 700;
-            text-transform: uppercase; cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--glow-red);
+        /* ESTILO GENERAL DE BOTONES PRO */
+        .btn-pro {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 20px; background: linear-gradient(135deg, var(--primary-red), #a00000);
+            color: #ffffff; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700;
+            letter-spacing: 0.5px; cursor: pointer; transition: all 0.25s ease;
+            box-shadow: 0 4px 15px var(--glow-red); text-transform: uppercase;
         }
-
-        .btn-submit:hover {
+        .btn-pro:hover {
             background: linear-gradient(135deg, var(--primary-red-hover), var(--primary-red));
-            box-shadow: 0 6px 20px rgba(255, 30, 39, 0.5);
+            box-shadow: 0 6px 20px rgba(255, 30, 39, 0.6); transform: translateY(-2px);
+        }
+        .btn-pro:active { transform: translateY(0); box-shadow: 0 2px 8px var(--glow-red); }
+        .btn-block { width: 100%; }
+
+        .btn-secondary {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            color: var(--text-color); box-shadow: none; text-transform: none;
+        }
+        .btn-secondary:hover {
+            border-color: var(--primary-red); color: var(--primary-red);
+            background: rgba(229, 9, 20, 0.05); transform: translateY(-1px);
         }
 
         .error-message {
-            color: var(--error-color); font-size: 0.85rem;
-            margin-top: 16px; text-align: center; display: none;
-            background: rgba(255, 77, 77, 0.1); padding: 10px;
-            border-radius: 8px; border: 1px solid rgba(255, 77, 77, 0.2);
+            color: var(--error-color); font-size: 0.85rem; margin-top: 16px;
+            text-align: center; display: none; background: rgba(255, 77, 77, 0.1);
+            padding: 10px; border-radius: 10px; border: 1px solid rgba(255, 77, 77, 0.2);
         }
 
         /* --- DASHBOARD LAYOUT --- */
         #dashboardScreen { display: none; min-height: 100vh; }
-
         .app-container { display: flex; min-height: 100vh; }
 
-        /* Sidebar Lateral */
         .sidebar {
-            width: 260px;
-            background-color: var(--card-bg);
+            width: 260px; background-color: var(--card-bg);
             border-right: 1px solid var(--border-color);
-            display: flex; flex-direction: column;
-            padding: 24px 16px;
+            display: flex; flex-direction: column; padding: 24px 16px; z-index: 10;
         }
-
         .sidebar-brand {
             display: flex; align-items: center; gap: 12px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 24px;
+            padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px;
         }
-
-        .sidebar-brand img { width: 40px; height: 40px; border-radius: 8px; }
+        .sidebar-brand img { width: 42px; height: 42px; border-radius: 10px; }
         .sidebar-brand h2 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
         .sidebar-brand h2 span { color: var(--primary-red); }
 
         .menu-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-        .menu-item a {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; color: var(--text-muted);
-            text-decoration: none; border-radius: 10px;
-            font-weight: 600; font-size: 0.95rem;
-            transition: all 0.2s ease;
+        .menu-item button {
+            width: 100%; display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; color: var(--text-muted); background: none; border: none;
+            border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer;
+            transition: all 0.2s ease; text-align: left;
         }
-
-        .menu-item.active a, .menu-item a:hover {
-            background-color: var(--input-bg);
-            color: var(--text-color);
+        .menu-item.active button, .menu-item button:hover {
+            background-color: var(--input-bg); color: var(--text-color);
             border-left: 3px solid var(--primary-red);
         }
+        .menu-item button i { font-size: 1.25rem; }
 
-        .menu-item a i { font-size: 1.2rem; }
-
-        /* Main Content Area */
         .main-content { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-color); }
-
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 32px; background-color: var(--card-bg);
+            padding: 20px 28px; background-color: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
         }
-
-        .user-info { display: flex; align-items: center; gap: 16px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
         .badge-role {
             background: rgba(229, 9, 20, 0.15); color: var(--primary-red);
-            padding: 4px 12px; border-radius: 20px;
-            font-size: 0.8rem; font-weight: 700;
+            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
             border: 1px solid rgba(229, 9, 20, 0.3);
         }
 
-        .btn-logout {
-            background: var(--input-bg); border: 1px solid var(--border-color);
-            color: var(--text-color); padding: 8px 16px; border-radius: 8px;
-            cursor: pointer; font-weight: 600; transition: all 0.2s;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .content-body { padding: 28px; flex: 1; }
 
-        .btn-logout:hover { border-color: var(--primary-red); color: var(--primary-red); }
-
-        .content-body { padding: 32px; flex: 1; }
-
-        /* Tarjetas de Métricas */
         .grid-stats {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px; margin-bottom: 32px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 28px;
         }
-
         .stat-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px; padding: 20px;
-            display: flex; align-items: center; justify-content: space-between;
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 20px; display: flex; align-items: center; justify-content: space-between;
         }
-
-        .stat-info h4 { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+        .stat-info h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         .stat-info .number { font-size: 1.8rem; font-weight: 800; }
         .stat-icon {
-            width: 48px; height: 48px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; background: var(--input-bg); color: var(--primary-red);
+            width: 48px; height: 48px; border-radius: 14px; display: flex;
+            align-items: center; justify-content: center; font-size: 1.5rem;
+            background: var(--input-bg); color: var(--primary-red); border: 1px solid var(--border-color);
         }
 
-        /* Tabla de Clientes */
         .data-section {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px; padding: 24px;
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 24px;
         }
-
         .section-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .btn-action {
-            background: var(--primary-red); color: white; border: none;
-            padding: 10px 18px; border-radius: 8px; font-weight: 700;
-            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
         }
 
         .table-responsive { overflow-x: auto; }
@@ -278,15 +206,40 @@
         th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
         th { color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
 
-        .status-badge {
-            padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .status-active { background: rgba(16, 185, 129, 0.15); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-demo { background: rgba(245, 158, 11, 0.15); color: var(--warning-color); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        .action-btns { display: flex; gap: 8px; }
+        .btn-icon {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            color: var(--text-color); width: 34px; height: 34px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
         }
-        .status-active { background: rgba(16, 185, 129, 0.15); color: var(--success-color); }
-        .status-demo { background: rgba(245, 158, 11, 0.15); color: var(--warning-color); }
+        .btn-icon:hover { border-color: var(--primary-red); color: var(--primary-red); }
+
+        /* MODALES FLOTANTES */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px;
+        }
+        .modal-box {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 20px; padding: 28px; width: 100%; max-width: 440px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px var(--glow-red);
+            position: relative; animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 1.2rem; }
+        .btn-close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; }
 
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
-            .sidebar { width: 100%; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .content-body { padding: 16px; }
+            .navbar { padding: 16px; }
         }
     </style>
 </head>
@@ -326,83 +279,73 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-submit">Iniciar Sesión</button>
+                <button type="submit" class="btn-pro btn-block">Iniciar Sesión</button>
                 <div id="errorMessage" class="error-message">Usuario o contraseña incorrectos.</div>
             </form>
         </div>
     </div>
 
-    <!-- PANTALLA PRINCIPAL DEL PANEL (DASHBOARD COMPLETO) -->
+    <!-- PANTALLA PRINCIPAL DEL PANEL -->
     <div id="dashboardScreen">
         <div class="app-container">
-            <!-- Sidebar Navigation -->
             <aside class="sidebar">
                 <div class="sidebar-brand">
                     <img src="ic_launcher.png" alt="Logo">
                     <h2>REMIX <span>PANEL</span></h2>
                 </div>
                 <ul class="menu-list">
-                    <li class="menu-item active"><a href="#"><i class="ph ph-squares-four"></i> Dashboard</a></li>
-                    <li class="menu-item"><a href="#"><i class="ph ph-user-plus"></i> Crear Cliente</a></li>
-                    <li class="menu-item"><a href="#"><i class="ph ph-clock"></i> Demos Rápidos</a></li>
-                    <li class="menu-item"><a href="#"><i class="ph ph-users"></i> Lista de Clientes</a></li>
-                    <li class="menu-item"><a href="#"><i class="ph ph-users-three"></i> Revendedores</a></li>
-                    <li class="menu-item"><a href="#"><i class="ph ph-coins"></i> Mis Créditos</a></li>
-                    <li class="menu-item"><a href="#"><i class="ph ph-gear"></i> Ajustes</a></li>
+                    <li class="menu-item active"><button onclick="switchTab('dash')"><i class="ph ph-squares-four"></i> Dashboard</button></li>
+                    <li class="menu-item"><button onclick="openModal('createModal')"><i class="ph ph-user-plus"></i> Crear Cliente</button></li>
+                    <li class="menu-item"><button onclick="generateDemo()"><i class="ph ph-clock"></i> Demo Rápido</button></li>
+                    <li class="menu-item"><button onclick="openModal('creditsModal')"><i class="ph ph-coins"></i> Mis Créditos</button></li>
+                    <li class="menu-item"><button onclick="openModal('settingsModal')"><i class="ph ph-gear"></i> Ajustes</button></li>
                 </ul>
             </aside>
 
-            <!-- Main Content Area -->
             <main class="main-content">
                 <header class="navbar">
                     <div>
-                        <h3 id="welcomeHeader">Bienvenido de nuevo</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">Panel de administración de Streaming IPTV</p>
+                        <h3 id="welcomeHeader">Bienvenido</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Administración Remix Panel</p>
                     </div>
                     <div class="user-info">
                         <span id="userBadge" class="badge-role">Administrador</span>
-                        <button class="btn-logout" onclick="logout()"><i class="ph ph-sign-out"></i> Salir</button>
+                        <button class="btn-pro btn-secondary" onclick="logout()"><i class="ph ph-sign-out"></i> Salir</button>
                     </div>
                 </header>
 
                 <div class="content-body">
-                    <!-- Cards de Métricas -->
                     <div class="grid-stats">
                         <div class="stat-card">
                             <div class="stat-info">
                                 <h4>Créditos</h4>
-                                <div class="number" style="color: var(--primary-red);">150</div>
+                                <div class="number" id="statCredits" style="color: var(--primary-red);">150</div>
                             </div>
                             <div class="stat-icon"><i class="ph ph-coins"></i></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-info">
                                 <h4>Clientes Activos</h4>
-                                <div class="number">42</div>
+                                <div class="number" id="statActive">2</div>
                             </div>
                             <div class="stat-icon"><i class="ph ph-users"></i></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-info">
-                                <h4>Demos Hoy</h4>
-                                <div class="number">8</div>
+                                <h4>Demos Creados</h4>
+                                <div class="number" id="statDemos">1</div>
                             </div>
                             <div class="stat-icon"><i class="ph ph-clock"></i></div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-info">
-                                <h4>Por Vencer</h4>
-                                <div class="number" style="color: var(--warning-color);">3</div>
-                            </div>
-                            <div class="stat-icon"><i class="ph ph-warning-circle"></i></div>
-                        </div>
                     </div>
 
-                    <!-- Tabla de Conexiones / Clientes -->
                     <div class="data-section">
                         <div class="section-header">
-                            <h3>Últimas Cuentas Creadas</h3>
-                            <button class="btn-action"><i class="ph ph-plus-circle"></i> Nuevo Cliente</button>
+                            <h3>Gestión de Clientes</h3>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-pro btn-secondary" onclick="generateDemo()"><i class="ph ph-lightning"></i> Demo Rápido</button>
+                                <button class="btn-pro" onclick="openModal('createModal')"><i class="ph ph-plus-circle"></i> Nuevo Cliente</button>
+                            </div>
                         </div>
                         <div class="table-responsive">
                             <table>
@@ -413,26 +356,11 @@
                                         <th>Plan</th>
                                         <th>Estado</th>
                                         <th>Vencimiento</th>
-                                        <th>Acción</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>cliente_demo1</td>
-                                        <td>882190</td>
-                                        <td>Demo 2 Horas</td>
-                                        <td><span class="status-badge status-demo">DEMO</span></td>
-                                        <td>Hoy, 18:30 HS</td>
-                                        <td><i class="ph ph-dots-three-vertical" style="cursor:pointer;"></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>juan_perez</td>
-                                        <td>441029</td>
-                                        <td>1 Mes - 2 Pantallas</td>
-                                        <td><span class="status-badge status-active">ACTIVO</span></td>
-                                        <td>27/10/2026</td>
-                                        <td><i class="ph ph-dots-three-vertical" style="cursor:pointer;"></i></td>
-                                    </tr>
+                                <tbody id="clientsTableBody">
+                                    <!-- Datos dinámicos -->
                                 </tbody>
                             </table>
                         </div>
@@ -442,12 +370,108 @@
         </div>
     </div>
 
+    <!-- MODAL: CREAR CLIENTE -->
+    <div id="createModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Crear Nuevo Cliente</h3>
+                <button class="btn-close-modal" onclick="closeModal('createModal')">&times;</button>
+            </div>
+            <form onsubmit="handleCreateClient(event)">
+                <div class="form-group">
+                    <label>Nombre de Usuario</label>
+                    <input type="text" id="newUsername" class="form-control" placeholder="Ej: cliente_1" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="text" id="newPassword" class="form-control" placeholder="Ej: 998877" required>
+                </div>
+                <div class="form-group">
+                    <label>Duración del Plan</label>
+                    <select id="newPlan" class="form-control">
+                        <option value="1 Mes">1 Mes (1 Crédito)</option>
+                        <option value="3 Meses">3 Meses (3 Créditos)</option>
+                        <option value="6 Meses">6 Meses (6 Créditos)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-pro btn-block" style="margin-top:10px;">Generar Cuenta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: MIS CRÉDITOS -->
+    <div id="creditsModal" class="modal-overlay">
+        <div class="modal-box" style="text-align: center;">
+            <div class="modal-header">
+                <h3>Mis Créditos</h3>
+                <button class="btn-close-modal" onclick="closeModal('creditsModal')">&times;</button>
+            </div>
+            <i class="ph ph-coins" style="font-size: 3.5rem; color: var(--primary-red);"></i>
+            <h2 style="font-size: 2.2rem; margin: 10px 0;" id="modalCreditsCount">150</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Créditos disponibles en tu saldo.</p>
+            <button class="btn-pro btn-block" style="margin-top: 20px;" onclick="alert('Solicitud enviada al proveedor.')">Comprar Mas Créditos</button>
+        </div>
+    </div>
+
+    <!-- MODAL: AJUSTES -->
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Ajustes de Cuenta</h3>
+                <button class="btn-close-modal" onclick="closeModal('settingsModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Nueva Contraseña</label>
+                <input type="password" id="changePass" class="form-control" placeholder="Ingresa nueva contraseña">
+            </div>
+            <button class="btn-pro btn-block" onclick="saveSettings()">Guardar Cambios</button>
+        </div>
+    </div>
+
     <script>
+        // Base de Datos en memoria
         const usersDatabase = {
             'admin': { password: 'admin123', role: 'Administrador' },
             'reseller': { password: 'reseller123', role: 'Revendedor' }
         };
 
+        let currentCredits = 150;
+        let clientsList = [
+            { user: 'juan_perez', pass: '441029', plan: '1 Mes', status: 'ACTIVO', expires: '27/10/2026' },
+            { user: 'demo_9821', pass: '110293', plan: 'Demo 2Hs', status: 'DEMO', expires: 'Hoy, 19:00 HS' }
+        ];
+
+        // Función renderizar tabla
+        function renderTable() {
+            const tbody = document.getElementById('clientsTableBody');
+            tbody.innerHTML = '';
+
+            clientsList.forEach((client, index) => {
+                const tr = document.createElement('tr');
+                const isDemo = client.status === 'DEMO';
+                tr.innerHTML = `
+                    <td><strong>${client.user}</strong></td>
+                    <td><code>${client.pass}</code></td>
+                    <td>${client.plan}</td>
+                    <td><span class="status-badge ${isDemo ? 'status-demo' : 'status-active'}">${client.status}</span></td>
+                    <td>${client.expires}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-icon" onclick="copyAccount('${client.user}', '${client.pass}')" title="Copiar"><i class="ph ph-copy"></i></button>
+                            <button class="btn-icon" onclick="deleteClient(${index})" title="Eliminar"><i class="ph ph-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('statCredits').innerText = currentCredits;
+            document.getElementById('modalCreditsCount').innerText = currentCredits;
+            document.getElementById('statActive').innerText = clientsList.filter(c => c.status === 'ACTIVO').length;
+            document.getElementById('statDemos').innerText = clientsList.filter(c => c.status === 'DEMO').length;
+        }
+
+        // Toggle Mostrar Contraseña
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const eyeOpen = document.getElementById('eyeOpen');
@@ -464,9 +488,9 @@
             }
         }
 
+        // Manejo Login
         function handleLogin(event) {
             event.preventDefault();
-            
             const usernameInput = document.getElementById('username').value.trim();
             const passwordInput = document.getElementById('password').value.trim();
             const errorMessage = document.getElementById('errorMessage');
@@ -474,21 +498,78 @@
             errorMessage.style.display = 'none';
 
             if (usersDatabase[usernameInput] && usersDatabase[usernameInput].password === passwordInput) {
-                const userRole = usersDatabase[usernameInput].role;
-                
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboardScreen').style.display = 'block';
-                document.getElementById('userBadge').innerText = userRole;
+                document.getElementById('userBadge').innerText = usersDatabase[usernameInput].role;
                 document.getElementById('welcomeHeader').innerText = `¡Bienvenido, ${usernameInput}!`;
+                renderTable();
             } else {
                 errorMessage.style.display = 'block';
             }
         }
 
+        // Logout
         function logout() {
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('dashboardScreen').style.display = 'none';
             document.getElementById('password').value = '';
+        }
+
+        // Modales
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Crear Cliente
+        function handleCreateClient(event) {
+            event.preventDefault();
+            if (currentCredits < 1) {
+                alert('No tienes suficientes créditos.');
+                return;
+            }
+            const user = document.getElementById('newUsername').value;
+            const pass = document.getElementById('newPassword').value;
+            const plan = document.getElementById('newPlan').value;
+
+            clientsList.unshift({ user, pass, plan, status: 'ACTIVO', expires: '27/10/2026' });
+            currentCredits -= 1;
+            renderTable();
+            closeModal('createModal');
+            alert(`¡Cliente ${user} creado con éxito!`);
+        }
+
+        // Generar Demo Rápido
+        function generateDemo() {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            const user = `demo_${randomNum}`;
+            const pass = `${Math.floor(100000 + Math.random() * 900000)}`;
+
+            clientsList.unshift({ user, pass, plan: 'Demo 2Hs', status: 'DEMO', expires: 'Hoy, 2 Horas' });
+            renderTable();
+            alert(`¡Demo Creado!\nUsuario: ${user}\nClave: ${pass}`);
+        }
+
+        // Copiar credenciales
+        function copyAccount(u, p) {
+            navigator.clipboard.writeText(`REMIX PANEL\nUsuario: ${u}\nClave: ${p}`);
+            alert('¡Datos copiados al portapapeles!');
+        }
+
+        // Eliminar Cliente
+        function deleteClient(index) {
+            if (confirm('¿Seguro que deseas eliminar esta cuenta?')) {
+                clientsList.splice(index, 1);
+                renderTable();
+            }
+        }
+
+        // Guardar Ajustes
+        function saveSettings() {
+            const newP = document.getElementById('changePass').value;
+            if(newP) {
+                usersDatabase['admin'].password = newP;
+                alert('¡Contraseña actualizada correctamente!');
+                closeModal('settingsModal');
+            }
         }
     </script>
 </body>
