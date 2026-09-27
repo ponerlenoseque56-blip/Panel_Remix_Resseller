@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Remix Panel - Panel Mayorista</title>
+    <title>Remix Panel - Panel Mayorista Nube</title>
     <!-- Iconos Phosphor -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- SDKs de Firebase (Compatibles con HTML directo) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg-color: #050508;
@@ -315,7 +320,7 @@
                 <header class="navbar">
                     <div>
                         <h3 id="welcomeHeader">Bienvenido</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Administración Remix Panel</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Administración Remix Panel Nube</p>
                     </div>
                     <div class="user-info">
                         <span id="userBadge" class="badge-role">Mayorista</span>
@@ -350,7 +355,7 @@
 
                     <div class="tab-buttons">
                         <button class="tab-btn active" id="btnTabClients" onclick="switchView('clients')">Clientes Finales</button>
-                        <button class="tab-btn" id="btnTabResellers" onclick="switchView('resellers')">Revendedores</button>
+                        <button class="tab-btn id-reseller-btn" id="btnTabResellers" onclick="switchView('resellers')">Revendedores</button>
                     </div>
 
                     <div class="data-section">
@@ -502,97 +507,124 @@
     </div>
 
     <script>
-        // Inicialización de Almacenamiento Local (LocalStorage)
-        function initData() {
-            if (!localStorage.getItem('usersDatabase')) {
-                const defaultUsers = {
-                    'admin': { password: 'admin123', role: 'Mayorista' },
-                    'reseller': { password: 'reseller123', role: 'Revendedor' }
-                };
-                localStorage.setItem('usersDatabase', JSON.stringify(defaultUsers));
-            }
-            if (!localStorage.getItem('clientsList')) {
-                const defaultClients = [
-                    { user: 'juan_perez', email: 'juan@gmail.com', pass: '441029', plan: '1 Mes', status: 'ACTIVO', expires: '27/10/2026' }
-                ];
-                localStorage.setItem('clientsList', JSON.stringify(defaultClients));
-            }
-            if (!localStorage.getItem('resellersList')) {
-                const defaultResellers = [
-                    { user: 'reseller', email: 'reventa1@gmail.com', pass: 'reseller123', credits: 25, status: 'ACTIVO' }
-                ];
-                localStorage.setItem('resellersList', JSON.stringify(defaultResellers));
-            }
-            if (!localStorage.getItem('revokedSessions')) {
-                localStorage.setItem('revokedSessions', JSON.stringify([]));
-            }
+        // CONFIGURACIÓN DE FIREBASE OBTENIDA DE TU PROYECTO
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdBFXsStAPS40kTihi4FXhAPkAwuGc_qI",
+            authDomain: "remix-284ab.firebaseapp.com",
+            databaseURL: "https://remix-284ab-default-rtdb.firebaseio.com",
+            projectId: "remix-284ab",
+            storageBucket: "remix-284ab.firebasestorage.app",
+            messagingSenderId: "1016068686574",
+            appId: "1:1016068686574:web:d2ab7610bf297be67c29ff"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Variables de estado local
+        let activeUser = localStorage.getItem('activeUser') || null;
+        let activeRole = localStorage.getItem('activeRole') || null;
+        let currentCredits = 0;
+        let currentView = 'clients';
+        let selectedKey = null;
+
+        let clientsList = [];
+        let resellersList = [];
+
+        // Inicializar cuenta Administrador por defecto en la nube
+        function initAdminCloud() {
+            db.ref('users/admin').once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    db.ref('users/admin').set({
+                        password: 'admin123',
+                        role: 'Mayorista',
+                        credits: 9999
+                    });
+                }
+            });
         }
 
-        initData();
+        initAdminCloud();
 
-        // Cargar variables desde el almacenamiento
-        let usersDatabase = JSON.parse(localStorage.getItem('usersDatabase'));
-        let clientsList = JSON.parse(localStorage.getItem('clientsList'));
-        let resellersList = JSON.parse(localStorage.getItem('resellersList'));
-        let revokedSessions = JSON.parse(localStorage.getItem('revokedSessions'));
-
-        let activeUser = localStorage.getItem('activeUser') || null;
-        let currentCredits = parseInt(localStorage.getItem('currentCredits')) || 9999;
-        let currentView = 'clients';
-        let selectedIndex = null;
-
-        // Comprobar estado de la sesión al cargar la página
+        // Escuchar sesión al cargar página
         window.onload = function() {
             if (activeUser) {
-                // Verificar si la sesión fue revocada (cuenta eliminada por el mayorista)
-                if (revokedSessions.includes(activeUser)) {
-                    logout();
-                    alert('Tu cuenta ha sido deshabilitada por el Administrador.');
-                    return;
-                }
-
-                // Verificar si el revendedor aún existe
-                if (usersDatabase[activeUser]) {
-                    showDashboard(activeUser, usersDatabase[activeUser].role);
-                } else {
-                    logout();
-                }
+                // Verificar en tiempo real si la cuenta del usuario sigue existiendo en la nube
+                db.ref('users/' + activeUser).on('value', (snapshot) => {
+                    const userData = snapshot.val();
+                    if (!userData) {
+                        alert('Tu cuenta ha sido eliminada o desactivada por el Administrador.');
+                        logout();
+                    } else {
+                        activeRole = userData.role;
+                        currentCredits = userData.credits || 0;
+                        showDashboard(activeUser, activeRole);
+                    }
+                });
             }
         };
 
-        // Escuchar eventos en vivo entre pestañas/ventanas para cerrar la sesión al instante si se elimina la cuenta
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'revokedSessions' || e.key === 'resellersList') {
-                revokedSessions = JSON.parse(localStorage.getItem('revokedSessions') || '[]');
-                usersDatabase = JSON.parse(localStorage.getItem('usersDatabase') || '{}');
-                
-                if (activeUser && (!usersDatabase[activeUser] || revokedSessions.includes(activeUser))) {
-                    logout();
-                    alert('Tu sesión ha finalizado. La cuenta fue eliminada o modificada.');
+        // Sincronizar Clientes desde la Nube en Tiempo Real
+        function syncClientsFromCloud() {
+            db.ref('clients').on('value', (snapshot) => {
+                const data = snapshot.val();
+                clientsList = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const item = data[key];
+                        item.key = key;
+                        // El Mayorista ve todo. El Revendedor solo ve sus propios clientes
+                        if (activeRole === 'Mayorista' || item.createdBy === activeUser) {
+                            clientsList.push(item);
+                        }
+                    });
                 }
-            }
-        });
-
-        // Guardar cambios en el almacenamiento local
-        function saveData() {
-            localStorage.setItem('usersDatabase', JSON.stringify(usersDatabase));
-            localStorage.setItem('clientsList', JSON.stringify(clientsList));
-            localStorage.setItem('resellersList', JSON.stringify(resellersList));
-            localStorage.setItem('revokedSessions', JSON.stringify(revokedSessions));
-            if (activeUser) {
-                localStorage.setItem('activeUser', activeUser);
-                localStorage.setItem('currentCredits', currentCredits);
-            }
+                if (currentView === 'clients') renderTable();
+            });
         }
 
-        // Cambiar vista entre Clientes y Revendedores
-        function switchView(view) {
-            currentView = view;
-            document.getElementById('btnTabClients').classList.toggle('active', view === 'clients');
-            document.getElementById('btnTabResellers').classList.toggle('active', view === 'resellers');
-            
-            document.getElementById('sectionTitle').innerText = (view === 'clients') ? 'Gestión de Clientes Finales' : 'Gestión de Revendedores';
-            renderTable();
+        // Sincronizar Revendedores desde la Nube en Tiempo Real
+        function syncResellersFromCloud() {
+            if (activeRole !== 'Mayorista') return;
+
+            db.ref('users').on('value', (snapshot) => {
+                const data = snapshot.val();
+                resellersList = [];
+                if (data) {
+                    Object.keys(data).forEach(userKey => {
+                        if (data[userKey].role === 'Revendedor') {
+                            resellersList.push({
+                                user: userKey,
+                                email: data[userKey].email || 'N/A',
+                                pass: data[userKey].password,
+                                credits: data[userKey].credits || 0,
+                                status: 'ACTIVO'
+                            });
+                        }
+                    });
+                }
+                if (currentView === 'resellers') renderTable();
+            });
+        }
+
+        // Mostrar Panel
+        function showDashboard(username, role) {
+            activeUser = username;
+            activeRole = role;
+            localStorage.setItem('activeUser', username);
+            localStorage.setItem('activeRole', role);
+
+            const resellerBtns = document.querySelectorAll('.id-reseller-btn');
+            resellerBtns.forEach(btn => btn.style.display = (role === 'Mayorista') ? 'flex' : 'none');
+
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboardScreen').style.display = 'block';
+            document.getElementById('userBadge').innerText = role;
+            document.getElementById('welcomeHeader').innerText = `¡Bienvenido, ${username}!`;
+
+            syncClientsFromCloud();
+            syncResellersFromCloud();
         }
 
         // Renderizar Tablas
@@ -607,12 +639,13 @@
                     <th>Correo</th>
                     <th>Contraseña</th>
                     <th>Plan</th>
+                    <th>Creado Por</th>
                     <th>Estado</th>
                     <th>Vencimiento</th>
                     <th>Acciones</th>
                 `;
 
-                clientsList.forEach((client, index) => {
+                clientsList.forEach((client) => {
                     const tr = document.createElement('tr');
                     const isDemo = client.status === 'DEMO';
                     tr.innerHTML = `
@@ -620,15 +653,16 @@
                         <td>${client.email}</td>
                         <td><code>${client.pass}</code></td>
                         <td>${client.plan}</td>
+                        <td><small style="color:var(--primary-red);">${client.createdBy || 'admin'}</small></td>
                         <td><span class="status-badge ${isDemo ? 'status-demo' : 'status-active'}">${client.status}</span></td>
                         <td>${client.expires}</td>
                         <td>
                             <div class="action-btns">
-                                <button class="btn-icon" onclick="renewClient(${index})" title="Renovar +1 Mes"><i class="ph ph-arrows-clockwise"></i></button>
-                                <button class="btn-icon" onclick="openEditEmailModal(${index})" title="Editar Correo"><i class="ph ph-envelope-simple"></i></button>
-                                <button class="btn-icon" onclick="openEditPassModal(${index})" title="Editar Clave"><i class="ph ph-key"></i></button>
+                                <button class="btn-icon" onclick="renewClient('${client.key}')" title="Renovar +1 Mes"><i class="ph ph-arrows-clockwise"></i></button>
+                                <button class="btn-icon" onclick="openEditEmailModal('${client.key}')" title="Editar Correo"><i class="ph ph-envelope-simple"></i></button>
+                                <button class="btn-icon" onclick="openEditPassModal('${client.key}')" title="Editar Clave"><i class="ph ph-key"></i></button>
                                 <button class="btn-icon" onclick="copyAccount('${client.user}', '${client.pass}')" title="Copiar"><i class="ph ph-copy"></i></button>
-                                <button class="btn-icon" onclick="deleteClient(${index})" title="Eliminar"><i class="ph ph-trash"></i></button>
+                                <button class="btn-icon" onclick="deleteClient('${client.key}')" title="Eliminar"><i class="ph ph-trash"></i></button>
                             </div>
                         </td>
                     `;
@@ -644,7 +678,7 @@
                     <th>Acciones</th>
                 `;
 
-                resellersList.forEach((reseller, index) => {
+                resellersList.forEach((reseller) => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td><strong>${reseller.user}</strong></td>
@@ -654,11 +688,10 @@
                         <td><span class="status-badge status-active">${reseller.status}</span></td>
                         <td>
                             <div class="action-btns">
-                                <button class="btn-icon" onclick="addCreditsToReseller(${index})" title="Sumar Créditos"><i class="ph ph-plus-circle"></i></button>
-                                <button class="btn-icon" onclick="openEditEmailModal(${index})" title="Editar Correo"><i class="ph ph-envelope-simple"></i></button>
-                                <button class="btn-icon" onclick="openEditPassModal(${index})" title="Editar Clave"><i class="ph ph-key"></i></button>
+                                <button class="btn-icon" onclick="addCreditsToReseller('${reseller.user}', ${reseller.credits})" title="Sumar Créditos"><i class="ph ph-plus-circle"></i></button>
+                                <button class="btn-icon" onclick="openEditPassModalReseller('${reseller.user}')" title="Editar Clave"><i class="ph ph-key"></i></button>
                                 <button class="btn-icon" onclick="copyAccount('${reseller.user}', '${reseller.pass}')" title="Copiar"><i class="ph ph-copy"></i></button>
-                                <button class="btn-icon" onclick="deleteReseller(${index})" title="Eliminar y Cerrar Sesión"><i class="ph ph-trash"></i></button>
+                                <button class="btn-icon" onclick="deleteReseller('${reseller.user}')" title="Eliminar y Cerrar Sesión"><i class="ph ph-trash"></i></button>
                             </div>
                         </td>
                     `;
@@ -672,20 +705,157 @@
             document.getElementById('statResellers').innerText = resellersList.length;
         }
 
-        // Mostrar Panel de Control
-        function showDashboard(username, role) {
-            activeUser = username;
-            const resellerBtns = document.querySelectorAll('.id-reseller-btn');
-            resellerBtns.forEach(btn => btn.style.display = (role === 'Mayorista') ? 'flex' : 'none');
+        // Login conectando a Firebase
+        function handleLogin(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
 
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboardScreen').style.display = 'block';
-            document.getElementById('userBadge').innerText = role;
-            document.getElementById('welcomeHeader').innerText = `¡Bienvenido, ${username}!`;
+            errorMessage.style.display = 'none';
+
+            db.ref('users/' + usernameInput).once('value', (snapshot) => {
+                const userData = snapshot.val();
+                if (userData && userData.password === passwordInput) {
+                    currentCredits = userData.credits || 0;
+                    showDashboard(usernameInput, userData.role);
+                } else {
+                    errorMessage.style.display = 'block';
+                }
+            });
+        }
+
+        // Cerrar Sesión
+        function logout() {
+            if (activeUser) db.ref('users/' + activeUser).off();
+            activeUser = null;
+            activeRole = null;
+            localStorage.removeItem('activeUser');
+            localStorage.removeItem('activeRole');
+
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboardScreen').style.display = 'none';
+            document.getElementById('password').value = '';
+        }
+
+        // Crear Cliente Final en la Nube
+        function handleCreateClient(event) {
+            event.preventDefault();
+            if (currentCredits < 1) {
+                alert('No tienes suficientes créditos.');
+                return;
+            }
+
+            const user = document.getElementById('newUsername').value.trim();
+            const email = document.getElementById('newEmail').value.trim();
+            const pass = document.getElementById('newPassword').value.trim();
+            const plan = document.getElementById('newPlan').value;
+
+            const newClientData = {
+                user, email, pass, plan,
+                status: 'ACTIVO',
+                expires: '27/10/2026',
+                createdBy: activeUser
+            };
+
+            // Descontar crédito
+            currentCredits -= 1;
+            db.ref('users/' + activeUser + '/credits').set(currentCredits);
+
+            // Guardar cliente en la nube
+            db.ref('clients').push(newClientData).then(() => {
+                closeModal('createModal');
+                alert(`¡Cliente ${user} creado con éxito en la nube!`);
+            });
+        }
+
+        // Crear Revendedor en la Nube
+        function handleCreateReseller(event) {
+            event.preventDefault();
+            const user = document.getElementById('newResellerUser').value.trim();
+            const email = document.getElementById('newResellerEmail').value.trim();
+            const pass = document.getElementById('newResellerPass').value.trim();
+            const creditsToGive = parseInt(document.getElementById('newResellerCredits').value);
+
+            if (creditsToGive > currentCredits && activeRole !== 'Mayorista') {
+                alert('No tienes suficientes créditos para asignar.');
+                return;
+            }
+
+            // Guardar Revendedor como Usuario de Firebase
+            db.ref('users/' + user).set({
+                password: pass,
+                role: 'Revendedor',
+                credits: creditsToGive,
+                email: email,
+                createdBy: activeUser
+            }).then(() => {
+                if (activeRole !== 'Mayorista') {
+                    currentCredits -= creditsToGive;
+                    db.ref('users/' + activeUser + '/credits').set(currentCredits);
+                }
+                closeModal('createResellerModal');
+                alert(`¡Revendedor ${user} creado en la nube con ${creditsToGive} créditos!`);
+            });
+        }
+
+        // Sumar Créditos a Revendedor
+        function addCreditsToReseller(resellerUser, currentResellerCredits) {
+            const add = prompt(`¿Cuántos créditos deseas añadirle a ${resellerUser}?`);
+            if (add && !isNaN(add) && parseInt(add) > 0) {
+                const amount = parseInt(add);
+                db.ref('users/' + resellerUser + '/credits').set(currentResellerCredits + amount);
+                alert('¡Créditos añadidos con éxito!');
+            }
+        }
+
+        // Eliminar Revendedor (Cierra su sesión automáticamente)
+        function deleteReseller(resellerUser) {
+            if (confirm(`¿Seguro que deseas eliminar al revendedor "${resellerUser}"? Su sesión se cerrará de forma automática inmediatamente.`)) {
+                db.ref('users/' + resellerUser).remove().then(() => {
+                    alert(`El revendedor ${resellerUser} fue eliminado de la nube.`);
+                });
+            }
+        }
+
+        // Eliminar Cliente
+        function deleteClient(clientKey) {
+            if (confirm('¿Seguro que deseas eliminar esta cuenta de la nube?')) {
+                db.ref('clients/' + clientKey).remove();
+            }
+        }
+
+        // Generar Demo Rápido
+        function generateDemo() {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            const user = `demo_${randomNum}`;
+            const pass = `${Math.floor(100000 + Math.random() * 900000)}`;
+
+            const demoData = {
+                user, email: 'demo@remix.com', pass,
+                plan: 'Demo 2Hs', status: 'DEMO',
+                expires: 'Hoy, 2 Horas', createdBy: activeUser
+            };
+
+            db.ref('clients').push(demoData).then(() => {
+                alert(`¡Demo Creado!\nUsuario: ${user}\nClave: ${pass}`);
+            });
+        }
+
+        // Cambiar Vistas
+        function switchView(view) {
+            currentView = view;
+            document.getElementById('btnTabClients').classList.toggle('active', view === 'clients');
+            document.getElementById('btnTabResellers').classList.toggle('active', view === 'resellers');
+            document.getElementById('sectionTitle').innerText = (view === 'clients') ? 'Gestión de Clientes Finales' : 'Gestión de Revendedores';
             renderTable();
         }
 
-        // Toggle Mostrar Contraseña
+        // Modales
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Mostrar / Ocultar Contraseña
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const eyeOpen = document.getElementById('eyeOpen');
@@ -702,238 +872,76 @@
             }
         }
 
-        // Login por Roles
-        function handleLogin(event) {
-            event.preventDefault();
-            const usernameInput = document.getElementById('username').value.trim();
-            const passwordInput = document.getElementById('password').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-
-            errorMessage.style.display = 'none';
-
-            if (usersDatabase[usernameInput] && usersDatabase[usernameInput].password === passwordInput) {
-                const userRole = usersDatabase[usernameInput].role;
-                currentCredits = (userRole === 'Mayorista') ? 9999 : (usersDatabase[usernameInput].credits || 50);
-
-                showDashboard(usernameInput, userRole);
-
-                // Quitar de lista revocada si vuelve a crearse o rehabilitarse
-                revokedSessions = revokedSessions.filter(u => u !== usernameInput);
-                saveData();
-            } else {
-                errorMessage.style.display = 'block';
-            }
-        }
-
-        // Cerrar Sesión
-        function logout() {
-            activeUser = null;
-            localStorage.removeItem('activeUser');
-            localStorage.removeItem('currentCredits');
-
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('dashboardScreen').style.display = 'none';
-            document.getElementById('password').value = '';
-        }
-
-        // Modales
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        // Crear Cliente Final
-        function handleCreateClient(event) {
-            event.preventDefault();
-            if (currentCredits < 1) {
-                alert('No tienes suficientes créditos.');
-                return;
-            }
-            const user = document.getElementById('newUsername').value;
-            const email = document.getElementById('newEmail').value;
-            const pass = document.getElementById('newPassword').value;
-            const plan = document.getElementById('newPlan').value;
-
-            clientsList.unshift({ user, email, pass, plan, status: 'ACTIVO', expires: '27/10/2026' });
-            currentCredits -= 1;
-            
-            // Actualizar créditos en objeto de usuario si es revendedor
-            if (usersDatabase[activeUser] && usersDatabase[activeUser].role === 'Revendedor') {
-                usersDatabase[activeUser].credits = currentCredits;
-            }
-
-            saveData();
-            renderTable();
-            closeModal('createModal');
-            alert(`¡Cliente ${user} creado con éxito!`);
-        }
-
-        // Crear Revendedor
-        function handleCreateReseller(event) {
-            event.preventDefault();
-            const user = document.getElementById('newResellerUser').value;
-            const email = document.getElementById('newResellerEmail').value;
-            const pass = document.getElementById('newResellerPass').value;
-            const creditsToGive = parseInt(document.getElementById('newResellerCredits').value);
-
-            if (creditsToGive > currentCredits) {
-                alert('No tienes suficientes créditos para asignar.');
-                return;
-            }
-
-            resellersList.unshift({ user, email, pass, credits: creditsToGive, status: 'ACTIVO' });
-            usersDatabase[user] = { password: pass, role: 'Revendedor', credits: creditsToGive };
-            currentCredits -= creditsToGive;
-
-            saveData();
-            renderTable();
-            closeModal('createResellerModal');
-            alert(`¡Revendedor ${user} creado con ${creditsToGive} créditos!`);
-        }
-
-        // Sumar Créditos a Revendedor
-        function addCreditsToReseller(index) {
-            const add = prompt(`¿Cuántos créditos deseas añadirle a ${resellersList[index].user}?`);
-            if (add && !isNaN(add) && parseInt(add) > 0) {
-                const amount = parseInt(add);
-                if (amount <= currentCredits) {
-                    resellersList[index].credits += amount;
-                    const rUser = resellersList[index].user;
-                    if (usersDatabase[rUser]) {
-                        usersDatabase[rUser].credits += amount;
-                    }
-                    currentCredits -= amount;
-                    saveData();
-                    renderTable();
-                    alert('¡Créditos añadidos con éxito!');
-                } else {
-                    alert('No tienes suficientes créditos.');
-                }
-            }
-        }
-
         // Renovar Cliente
-        function renewClient(index) {
+        function renewClient(clientKey) {
             if (currentCredits < 1) {
                 alert('No tienes saldo suficiente.');
                 return;
             }
-            if (confirm(`¿Deseas renovar 1 Mes a ${clientsList[index].user} por 1 Crédito?`)) {
+            if (confirm(`¿Deseas renovar 1 Mes por 1 Crédito?`)) {
                 currentCredits -= 1;
-                clientsList[index].expires = '27/11/2026';
-                
-                if (usersDatabase[activeUser] && usersDatabase[activeUser].role === 'Revendedor') {
-                    usersDatabase[activeUser].credits = currentCredits;
-                }
-
-                saveData();
-                renderTable();
+                db.ref('users/' + activeUser + '/credits').set(currentCredits);
+                db.ref('clients/' + clientKey + '/expires').set('27/11/2026');
                 alert('¡Cuenta renovada!');
             }
         }
 
-        // Modificar Correo
-        function openEditEmailModal(index) {
-            selectedIndex = index;
-            const list = (currentView === 'clients') ? clientsList : resellersList;
-            document.getElementById('editEmailInput').value = list[index].email;
+        // Modificar Correo Cliente
+        function openEditEmailModal(key) {
+            selectedKey = key;
             openModal('editEmailModal');
         }
 
         function saveEmail() {
             const newEmail = document.getElementById('editEmailInput').value;
-            if (newEmail) {
-                if (currentView === 'clients') {
-                    clientsList[selectedIndex].email = newEmail;
-                } else {
-                    resellersList[selectedIndex].email = newEmail;
-                }
-                saveData();
-                renderTable();
-                closeModal('editEmailModal');
-                alert('¡Correo actualizado!');
+            if (newEmail && selectedKey) {
+                db.ref('clients/' + selectedKey + '/email').set(newEmail).then(() => {
+                    closeModal('editEmailModal');
+                    alert('¡Correo actualizado en la nube!');
+                });
             }
         }
 
-        // Modificar Contraseña
-        function openEditPassModal(index) {
-            selectedIndex = index;
-            const list = (currentView === 'clients') ? clientsList : resellersList;
-            document.getElementById('editPassInput').value = list[index].pass;
+        // Modificar Contraseña Cliente
+        function openEditPassModal(key) {
+            selectedKey = key;
             openModal('editPassModal');
         }
 
         function savePassword() {
             const newPass = document.getElementById('editPassInput').value;
-            if (newPass) {
-                if (currentView === 'clients') {
-                    clientsList[selectedIndex].pass = newPass;
-                } else {
-                    const rUser = resellersList[selectedIndex].user;
-                    resellersList[selectedIndex].pass = newPass;
-                    if (usersDatabase[rUser]) {
-                        usersDatabase[rUser].password = newPass;
-                    }
-                }
-                saveData();
-                renderTable();
-                closeModal('editPassModal');
-                alert('¡Contraseña actualizada!');
+            if (newPass && selectedKey) {
+                db.ref('clients/' + selectedKey + '/pass').set(newPass).then(() => {
+                    closeModal('editPassModal');
+                    alert('¡Contraseña actualizada en la nube!');
+                });
             }
         }
 
-        // Generar Demo Rápido
-        function generateDemo() {
-            const randomNum = Math.floor(1000 + Math.random() * 9000);
-            const user = `demo_${randomNum}`;
-            const pass = `${Math.floor(100000 + Math.random() * 900000)}`;
-
-            clientsList.unshift({ user, email: 'demo@remix.com', pass, plan: 'Demo 2Hs', status: 'DEMO', expires: 'Hoy, 2 Horas' });
-            saveData();
-            renderTable();
-            alert(`¡Demo Creado!\nUsuario: ${user}\nClave: ${pass}`);
+        // Modificar Contraseña Revendedor
+        function openEditPassModalReseller(resellerUser) {
+            const newPass = prompt(`Ingresa la nueva contraseña para ${resellerUser}:`);
+            if (newPass) {
+                db.ref('users/' + resellerUser + '/password').set(newPass).then(() => {
+                    alert('¡Contraseña de revendedor actualizada!');
+                });
+            }
         }
 
-        // Copiar credenciales
+        // Copiar Credenciales
         function copyAccount(u, p) {
             navigator.clipboard.writeText(`REMIX PANEL\nUsuario: ${u}\nClave: ${p}`);
             alert('¡Datos copiados!');
         }
 
-        // Eliminar Cliente
-        function deleteClient(index) {
-            if (confirm('¿Seguro que deseas eliminar esta cuenta?')) {
-                clientsList.splice(index, 1);
-                saveData();
-                renderTable();
-            }
-        }
-
-        // Eliminar Revendedor (Provoca el Cierre de Sesión Inmediato del Revendedor)
-        function deleteReseller(index) {
-            const resellerUser = resellersList[index].user;
-            if (confirm(`¿Seguro que deseas eliminar al revendedor "${resellerUser}"? Su sesión se cerrará de forma automática.`)) {
-                // 1. Eliminar de la lista de revendedores y base de usuarios
-                resellersList.splice(index, 1);
-                delete usersDatabase[resellerUser];
-
-                // 2. Añadir a la lista de revocación para forzar cierre de sesión activo
-                if (!revokedSessions.includes(resellerUser)) {
-                    revokedSessions.push(resellerUser);
-                }
-
-                saveData();
-                renderTable();
-                alert(`El revendedor ${resellerUser} fue eliminado y su sesión cancelada.`);
-            }
-        }
-
-        // Guardar Contraseña del Perfil
+        // Cambiar Contraseña Propia
         function saveSettings() {
             const newP = document.getElementById('changePass').value;
             if(newP) {
-                usersDatabase[activeUser].password = newP;
-                saveData();
-                alert('¡Contraseña actualizada!');
-                closeModal('settingsModal');
+                db.ref('users/' + activeUser + '/password').set(newP).then(() => {
+                    alert('¡Tu contraseña fue actualizada!');
+                    closeModal('settingsModal');
+                });
             }
         }
     </script>
