@@ -3,512 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TvOnline Panel - Mayorista Master</title>
+    <title>Panel de Administración - Streaming IPTV</title>
+    <!-- Estilos base e iconos -->
     <style>
         :root {
-            --bg-color: #0d0d0d;
-            --card-bg: #18181c;
-            --card-border: #2a2a30;
-            --primary-purple: #7000ff;
-            --accent-pink: #d900ff;
-            --text-main: #ffffff;
-            --text-muted: #a0a0a0;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #334155;
+            --border-color: #475569;
+            --error-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
+            color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-        }
-
-        .mobile-container {
-            width: 100%;
-            max-width: 420px;
-            min-height: 100vh;
-            padding: 20px 16px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* Views */
-        #loginView {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-            max-width: 360px;
-            padding: 24px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            box-sizing: border-box;
-        }
-
-        #panelView { display: none; width: 100%; }
-
-        .brand-title {
-            font-size: 24px;
-            font-weight: bold;
-            font-style: italic;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .brand-title span { color: #00a2ff; font-style: normal; font-size: 15px; }
-
-        /* Form elements */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 14px;
-        }
-        .form-group label { font-size: 13px; color: var(--text-muted); }
-        .form-group input, .form-group select {
-            padding: 12px;
-            background: #0d0d0d;
-            border: 1px solid var(--card-border);
-            color: white;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink));
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 15px;
-            margin-top: 10px;
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .user-badge {
-            background: #1f1f26;
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid #3a3a45;
-            font-size: 12px;
-            color: var(--accent-pink);
-            font-weight: bold;
-        }
-        .btn-logout {
-            background: #2a2a30;
-            color: var(--text-muted);
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        /* Balance */
-        .balance-card { text-align: center; padding: 10px 0; }
-        .balance-title { font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
-        .balance-amount { font-size: 36px; font-weight: bold; }
-
-        /* Actions Grid */
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .btn-action {
-            background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink));
-            border: none;
-            border-radius: 12px;
-            padding: 14px 8px;
-            color: white;
-            font-weight: bold;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        /* Cards */
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-        .card-info { display: flex; align-items: center; gap: 12px; }
-        .card-title { font-size: 15px; font-weight: 600; }
-        .card-subtitle { font-size: 12px; color: var(--text-muted); }
-
-        .add-btn {
-            background: #25252e;
-            border: 1px solid #404050;
-            color: white;
-            border-radius: 8px;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Modales */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-        .modal-content {
-            background: var(--card-bg);
             padding: 20px;
-            border-radius: 16px;
-            width: 85%;
-            max-width: 340px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            border: 1px solid var(--card-border);
         }
 
-        /* User List Items */
-        .user-item {
-            background: #0d0d0d;
-            border: 1px solid #2a2a30;
-            border-radius: 8px;
-            padding: 10px 12px;
+        .login-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            font-size: 1.6rem;
+            color: var(--text-color);
             margin-bottom: 8px;
+        }
+
+        .login-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .input-container {
+            position: relative;
             display: flex;
-            justify-content: space-between;
             align-items: center;
         }
-        .user-details { font-size: 13px; }
-        .user-details div { margin-bottom: 2px; }
-        .credits-tag {
-            background: #1f1f26;
-            color: var(--accent-pink);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+        }
+
+        .password-input {
+            padding-right: 45px;
+        }
+
+        /* Botón estilo ojito */
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-color);
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-<!-- 1. LOGIN VISTA -->
-<div id="loginView">
-    <div class="brand-title">TvOnline <span>Panel</span></div>
-    <form onsubmit="handleLogin(event)">
-        <div class="form-group">
-            <label>Usuario Mayorista</label>
-            <input type="text" id="loginUser" placeholder="Ingresa tu usuario" required>
+    <div class="login-card">
+        <div class="login-header">
+            <h1>Acceso al Panel</h1>
+            <p>Ingresa tus credenciales para continuar</p>
         </div>
-        <div class="form-group">
-            <label>Contraseña Máster</label>
-            <input type="password" id="loginPass" placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="btn-primary">Ingresar como Mayorista</button>
-    </form>
-    <div style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:15px;">
-        Acceso exclusivo Mayorista: <b>admin</b> / <b>admin123</b>
-    </div>
-</div>
 
-<!-- 2. PANEL VISTA (MAYORISTA) -->
-<div id="panelView">
-    <div class="mobile-container">
-        <!-- Header -->
-        <div class="header">
-            <div class="brand-title" style="margin:0; text-align:left;">TvOnline <span>Panel</span></div>
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span class="user-badge" id="myRole">MAYORISTA MÁSTER</span>
-                <button class="btn-logout" onclick="logout()">Salir</button>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" class="form-control" placeholder="Nombre de usuario" required autocomplete="username">
             </div>
-        </div>
 
-        <!-- Balance Mayorista -->
-        <div class="balance-card">
-            <div class="balance-title">Total balance (Créditos Globales) 👁️</div>
-            <div class="balance-amount" id="masterBalance">1000,00</div>
-        </div>
-
-        <!-- Actions -->
-        <div class="actions-grid">
-            <button class="btn-action" onclick="openDepositModal()">
-                <span>⬆️</span> Depositar
-            </button>
-            <button class="btn-action" onclick="openCreateUserModal()">
-                <span>➕</span> Crear Usuario
-            </button>
-            <button class="btn-action" onclick="alert('Funcionalidad de carga mediante cupón/código voucher')">
-                <span>📅</span> Cargar
-            </button>
-        </div>
-
-        <!-- Direct Clients -->
-        <div class="card" onclick="openBranchList('Cliente Final')">
-            <div class="card-info">
-                <span>👤</span>
-                <div>
-                    <div class="card-title">Clientes Finales</div>
-                    <div class="card-subtitle" id="count-cliente">0 registrados</div>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="input-container">
+                    <input type="password" id="password" class="form-control password-input" placeholder="••••••••" required autocomplete="current-password">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" title="Mostrar/Ocultar contraseña">
+                        <!-- Icono de ojo abierto -->
+                        <svg id="eyeOpen" viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <!-- Icono de ojo tachado (oculto por defecto) -->
+                        <svg id="eyeClosed" viewBox="0 0 24 24" style="display: none;">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
                 </div>
             </div>
-            <div class="add-btn" onclick="event.stopPropagation(); openCreateUserModal('Cliente Final')">+</div>
-        </div>
 
-        <!-- Hierarchy Categories -->
-        <div style="font-size: 13px; color: var(--text-muted); margin-top: 14px;">SUB-CUENTAS / JERARQUÍA</div>
-
-        <div class="card" onclick="openBranchList('Vendedor')">
-            <div class="card-info">
-                <span>🛍️</span>
-                <div>
-                    <div class="card-title" style="color: var(--accent-pink);">Vendedor</div>
-                    <div class="card-subtitle" id="count-vendedor">0 registrados</div>
-                </div>
-            </div>
-            <div class="add-btn" onclick="event.stopPropagation(); openCreateUserModal('Vendedor')">+</div>
-        </div>
-
-        <div class="card" onclick="openBranchList('Revendedor')">
-            <div class="card-info">
-                <span>💼</span>
-                <div>
-                    <div class="card-title">Revendedor</div>
-                    <div class="card-subtitle" id="count-revendedor">0 registrados</div>
-                </div>
-            </div>
-            <div class="add-btn" onclick="event.stopPropagation(); openCreateUserModal('Revendedor')">+</div>
-        </div>
-
-        <div class="card" onclick="openBranchList('Minorista')">
-            <div class="card-info">
-                <span>🛒</span>
-                <div>
-                    <div class="card-title">Minorista</div>
-                    <div class="card-subtitle" id="count-minorista">0 registrados</div>
-                </div>
-            </div>
-            <div class="add-btn" onclick="event.stopPropagation(); openCreateUserModal('Minorista')">+</div>
-        </div>
+            <button type="submit" class="btn-submit">Iniciar Sesión</button>
+            <div id="errorMessage" class="error-message">Usuario o contraseña incorrectos.</div>
+        </form>
     </div>
-</div>
 
-<!-- MODAL 1: RECARGAR CRÉDITOS MAYORISTA -->
-<div class="modal" id="depositModal">
-    <div class="modal-content">
-        <h3 style="margin:0;">Recargar Créditos Globales</h3>
-        <p style="font-size:12px; color:var(--text-muted); margin:0;">Ingresa la cantidad de créditos a cargar en tu balance Máster.</p>
-        
-        <div class="form-group" style="margin:0;">
-            <label>Monto de Créditos</label>
-            <input type="number" id="depositAmount" placeholder="Ej: 500" value="500" required>
-        </div>
+    <script>
+        // Credenciales predefinidas para la prueba
+        const usersDatabase = {
+            'admin': { password: 'admin123', role: 'Administrador' },
+            'reseller': { password: 'reseller123', role: 'Reseller' }
+        };
 
-        <button class="btn-primary" onclick="addMasterCredits()">Añadir al Balance</button>
-        <button class="btn-logout" style="padding:10px;" onclick="closeModal('depositModal')">Cancelar</button>
-    </div>
-</div>
+        // Función para mostrar/ocultar contraseña
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeOpen = document.getElementById('eyeOpen');
+            const eyeClosed = document.getElementById('eyeClosed');
 
-<!-- MODAL 2: CREAR USUARIO EN UNA RAMA -->
-<div class="modal" id="createModal">
-    <div class="modal-content">
-        <h3 style="margin:0;" id="modalCreateTitle">Crear Usuario</h3>
-        
-        <div class="form-group" style="margin:0;">
-            <label>Rama / Rol</label>
-            <select id="newRole">
-                <option value="Vendedor">Vendedor</option>
-                <option value="Revendedor">Revendedor</option>
-                <option value="Minorista">Minorista</option>
-                <option value="Cliente Final">Cliente Final</option>
-            </select>
-        </div>
-
-        <div class="form-group" style="margin:0;">
-            <label>Nombre de Usuario</label>
-            <input type="text" id="newUsername" placeholder="ej: usuario1" required>
-        </div>
-
-        <div class="form-group" style="margin:0;">
-            <label>Contraseña</label>
-            <input type="text" id="newPassword" placeholder="••••••••" required>
-        </div>
-
-        <div class="form-group" style="margin:0;">
-            <label>Asignar Créditos Iniciales</label>
-            <input type="number" id="newCredits" placeholder="0" value="10" required>
-        </div>
-
-        <button class="btn-primary" onclick="saveUser()">Guardar y Generar</button>
-        <button class="btn-logout" style="padding:10px;" onclick="closeModal('createModal')">Cancelar</button>
-    </div>
-</div>
-
-<!-- MODAL 3: LISTAR USUARIOS DE UNA RAMA -->
-<div class="modal" id="listModal">
-    <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
-        <h3 style="margin:0;" id="modalListTitle">Usuarios Registrados</h3>
-        <div id="usersContainer">
-            <!-- Se cargan dinámicamente -->
-        </div>
-        <button class="btn-logout" style="padding:10px; margin-top:10px;" onclick="closeModal('listModal')">Cerrar</button>
-    </div>
-</div>
-
-<script>
-    // Base de datos local (En memoria)
-    let masterCredits = 1000.00;
-    let usersDB = [];
-
-    function handleLogin(e) {
-        e.preventDefault();
-        const user = document.getElementById('loginUser').value.trim();
-        const pass = document.getElementById('loginPass').value.trim();
-
-        // Clave única del Mayorista
-        if (user === 'admin' && pass === 'admin123') {
-            document.getElementById('loginView').style.display = 'none';
-            document.getElementById('panelView').style.display = 'block';
-            updateUI();
-        } else {
-            alert('Acceso denegado. Solo el Mayorista con credenciales correctas puede ingresar.');
-        }
-    }
-
-    function logout() {
-        document.getElementById('panelView').style.display = 'none';
-        document.getElementById('loginView').style.display = 'flex';
-    }
-
-    function openDepositModal() {
-        document.getElementById('depositAmount').value = '500';
-        document.getElementById('depositModal').style.display = 'flex';
-    }
-
-    function addMasterCredits() {
-        const amount = parseFloat(document.getElementById('depositAmount').value) || 0;
-        if (amount <= 0) {
-            alert('Ingresa un monto válido.');
-            return;
-        }
-        masterCredits += amount;
-        alert(`¡Se han cargado ${amount} créditos exitosamente a tu cuenta de Mayorista!`);
-        closeModal('depositModal');
-        updateUI();
-    }
-
-    function openCreateUserModal(defaultRole = 'Vendedor') {
-        document.getElementById('newRole').value = defaultRole;
-        document.getElementById('newUsername').value = '';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('newCredits').value = '10';
-        document.getElementById('createModal').style.display = 'flex';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    function saveUser() {
-        const role = document.getElementById('newRole').value;
-        const username = document.getElementById('newUsername').value.trim();
-        const password = document.getElementById('newPassword').value.trim();
-        const credits = parseFloat(document.getElementById('newCredits').value) || 0;
-
-        if (!username || !password) {
-            alert('Completa el usuario y la contraseña.');
-            return;
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeOpen.style.display = 'none';
+                eyeClosed.style.display = 'block';
+            } else {
+                passwordInput.type = 'password';
+                eyeOpen.style.display = 'block';
+                eyeClosed.style.display = 'none';
+            }
         }
 
-        if (credits > masterCredits) {
-            alert('No tienes suficientes créditos en tu balance mayorista. Usa la opción "Depositar" para recargar tu cuenta.');
-            return;
+        // Validación de Inicio de Sesión
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+
+            errorMessage.style.display = 'none';
+
+            // Comprobación de usuario y clave
+            if (usersDatabase[usernameInput] && usersDatabase[usernameInput].password === passwordInput) {
+                const userRole = usersDatabase[usernameInput].role;
+                alert(`¡Bienvenido! Has ingresado correctamente como ${userRole}.`);
+                // Redirección al Dashboard según el rol (aquí puedes cargar tu vista principal)
+            } else {
+                errorMessage.style.display = 'block';
+            }
         }
-
-        // Restar créditos al balance Máster
-        masterCredits -= credits;
-
-        // Guardar nuevo usuario
-        usersDB.push({
-            id: Date.now(),
-            role: role,
-            username: username,
-            password: password,
-            credits: credits
-        });
-
-        alert(`¡Usuario creado con éxito en la rama ${role}!`);
-        closeModal('createModal');
-        updateUI();
-    }
-
-    function openBranchList(role) {
-        document.getElementById('modalListTitle').innerText = `Rama: ${role}`;
-        const container = document.getElementById('usersContainer');
-        container.innerHTML = '';
-
-        const filtered = usersDB.filter(u => u.role === role);
-
-        if (filtered.length === 0) {
-            container.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px; text-align:center;">No hay usuarios creados en esta rama.</div>';
-        } else {
-            filtered.forEach(u => {
-                const item = document.createElement('div');
-                item.className = 'user-item';
-                item.innerHTML = `
-                    <div class="user-details">
-                        <div><b>Usuario:</b> ${u.username}</div>
-                        <div style="color:var(--text-muted);"><b>Clave:</b> ${u.password}</div>
-                    </div>
-                    <div class="credits-tag">${u.credits} Cr.</div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        document.getElementById('listModal').style.display = 'flex';
-    }
-
-    function updateUI() {
-        document.getElementById('masterBalance').innerText = masterCredits.toFixed(2);
-
-        // Contar por rama
-        ['Vendedor', 'Revendedor', 'Minorista', 'Cliente Final'].forEach(role => {
-            const count = usersDB.filter(u => u.role === role).length;
-            const targetId = role === 'Cliente Final' ? 'count-cliente' : `count-${role.toLowerCase()}`;
-            const el = document.getElementById(targetId);
-            if (el) el.innerText = `${count} registrados`;
-        });
-    }
-</script>
-
+    </script>
 </body>
 </html>
