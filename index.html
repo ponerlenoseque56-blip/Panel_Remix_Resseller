@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Remix Panel - Panel de Control</title>
+    <title>Remix Panel - Panel Mayorista</title>
     <!-- Iconos Phosphor -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -78,7 +78,7 @@
         .login-header h1 span { color: var(--primary-red); }
         .login-header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
         .form-group label {
             display: block; margin-bottom: 8px; font-size: 0.8rem;
             font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
@@ -86,7 +86,7 @@
 
         .input-container { position: relative; display: flex; align-items: center; }
         .form-control {
-            width: 100%; padding: 14px 16px; background-color: var(--input-bg);
+            width: 100%; padding: 12px 16px; background-color: var(--input-bg);
             border: 1px solid var(--border-color); border-radius: 12px;
             color: var(--text-color); font-size: 0.95rem; outline: none; transition: all 0.3s ease;
         }
@@ -104,8 +104,8 @@
         /* BOTONES PRO */
         .btn-pro {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 20px; background: linear-gradient(135deg, var(--primary-red), #a00000);
-            color: #ffffff; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700;
+            padding: 12px 18px; background: linear-gradient(135deg, var(--primary-red), #a00000);
+            color: #ffffff; border: none; border-radius: 12px; font-size: 0.85rem; font-weight: 700;
             letter-spacing: 0.5px; cursor: pointer; transition: all 0.25s ease;
             box-shadow: 0 4px 15px var(--glow-red); text-transform: uppercase;
         }
@@ -177,20 +177,28 @@
         .content-body { padding: 28px; flex: 1; }
 
         .grid-stats {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px; margin-bottom: 28px;
         }
         .stat-card {
             background-color: var(--card-bg); border: 1px solid var(--border-color);
             border-radius: 16px; padding: 20px; display: flex; align-items: center; justify-content: space-between;
         }
-        .stat-info h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .stat-info h4 { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         .stat-info .number { font-size: 1.8rem; font-weight: 800; }
         .stat-icon {
             width: 48px; height: 48px; border-radius: 14px; display: flex;
             align-items: center; justify-content: center; font-size: 1.5rem;
             background: var(--input-bg); color: var(--primary-red); border: 1px solid var(--border-color);
         }
+
+        /* PESTAÑAS Y TABLAS */
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 16px; }
+        .tab-btn {
+            padding: 10px 18px; background: var(--input-bg); border: 1px solid var(--border-color);
+            color: var(--text-muted); border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.85rem;
+        }
+        .tab-btn.active { background: var(--primary-red); color: #fff; border-color: var(--primary-red); }
 
         .data-section {
             background-color: var(--card-bg); border: 1px solid var(--border-color);
@@ -203,17 +211,17 @@
 
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th, td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
         th { color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
 
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
         .status-active { background: rgba(16, 185, 129, 0.15); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.3); }
         .status-demo { background: rgba(245, 158, 11, 0.15); color: var(--warning-color); border: 1px solid rgba(245, 158, 11, 0.3); }
 
-        .action-btns { display: flex; gap: 8px; }
+        .action-btns { display: flex; gap: 6px; }
         .btn-icon {
             background: var(--input-bg); border: 1px solid var(--border-color);
-            color: var(--text-color); width: 34px; height: 34px; border-radius: 8px;
+            color: var(--text-color); width: 32px; height: 32px; border-radius: 8px;
             display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
         }
         .btn-icon:hover { border-color: var(--primary-red); color: var(--primary-red); }
@@ -295,7 +303,8 @@
                 </div>
                 <ul class="menu-list">
                     <li class="menu-item active"><button><i class="ph ph-squares-four"></i> Dashboard</button></li>
-                    <li class="menu-item"><button onclick="openModal('createModal')"><i class="ph ph-user-plus"></i> Crear Cliente</button></li>
+                    <li class="menu-item"><button onclick="openModal('createModal')"><i class="ph ph-user-plus"></i> Crear Cliente Final</button></li>
+                    <li class="menu-item id-reseller-btn"><button onclick="openModal('createResellerModal')"><i class="ph ph-users-three"></i> Crear Revendedor</button></li>
                     <li class="menu-item"><button onclick="generateDemo()"><i class="ph ph-clock"></i> Demo Rápido</button></li>
                     <li class="menu-item"><button onclick="openModal('creditsModal')"><i class="ph ph-coins"></i> Mis Créditos</button></li>
                     <li class="menu-item"><button onclick="openModal('settingsModal')"><i class="ph ph-gear"></i> Ajustes</button></li>
@@ -325,38 +334,39 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-info">
-                                <h4>Clientes Activos</h4>
-                                <div class="number" id="statActive">1</div>
+                                <h4>Clientes Finales</h4>
+                                <div class="number" id="statActive">0</div>
                             </div>
                             <div class="stat-icon"><i class="ph ph-users"></i></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-info">
-                                <h4>Demos Creados</h4>
-                                <div class="number" id="statDemos">1</div>
+                                <h4>Revendedores</h4>
+                                <div class="number" id="statResellers">0</div>
                             </div>
-                            <div class="stat-icon"><i class="ph ph-clock"></i></div>
+                            <div class="stat-icon"><i class="ph ph-users-three"></i></div>
                         </div>
+                    </div>
+
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" id="btnTabClients" onclick="switchView('clients')">Clientes Finales</button>
+                        <button class="tab-btn" id="btnTabResellers" onclick="switchView('resellers')">Revendedores</button>
                     </div>
 
                     <div class="data-section">
                         <div class="section-header">
-                            <h3>Gestión de Clientes</h3>
-                            <div style="display:flex; gap:10px;">
+                            <h3 id="sectionTitle">Gestión de Clientes Finales</h3>
+                            <div style="display:flex; gap:10px;" id="actionButtonsHeader">
                                 <button class="btn-pro btn-secondary" onclick="generateDemo()"><i class="ph ph-lightning"></i> Demo Rápido</button>
                                 <button class="btn-pro" onclick="openModal('createModal')"><i class="ph ph-plus-circle"></i> Nuevo Cliente</button>
+                                <button class="btn-pro id-reseller-btn" onclick="openModal('createResellerModal')" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"><i class="ph ph-user-switch"></i> Nuevo Revendedor</button>
                             </div>
                         </div>
                         <div class="table-responsive">
                             <table>
                                 <thead>
-                                    <tr>
-                                        <th>Usuario</th>
-                                        <th>Contraseña</th>
-                                        <th>Plan</th>
-                                        <th>Estado</th>
-                                        <th>Vencimiento</th>
-                                        <th>Acciones</th>
+                                    <tr id="tableHeaders">
+                                        <!-- Cabeceras dinámicas -->
                                     </tr>
                                 </thead>
                                 <tbody id="clientsTableBody">
@@ -370,32 +380,95 @@
         </div>
     </div>
 
-    <!-- MODAL: CREAR CLIENTE -->
+    <!-- MODAL: CREAR CLIENTE FINAL -->
     <div id="createModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <h3>Crear Nuevo Cliente</h3>
+                <h3>Crear Cliente Final</h3>
                 <button class="btn-close-modal" onclick="closeModal('createModal')">&times;</button>
             </div>
             <form onsubmit="handleCreateClient(event)">
                 <div class="form-group">
-                    <label>Nombre de Usuario</label>
+                    <label>Usuario</label>
                     <input type="text" id="newUsername" class="form-control" placeholder="Ej: cliente_1" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="newEmail" class="form-control" placeholder="cliente@correo.com" required>
                 </div>
                 <div class="form-group">
                     <label>Contraseña</label>
                     <input type="text" id="newPassword" class="form-control" placeholder="Ej: 998877" required>
                 </div>
                 <div class="form-group">
-                    <label>Duración del Plan</label>
+                    <label>Plan</label>
                     <select id="newPlan" class="form-control">
                         <option value="1 Mes">1 Mes (1 Crédito)</option>
                         <option value="3 Meses">3 Meses (3 Créditos)</option>
                         <option value="6 Meses">6 Meses (6 Créditos)</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-pro btn-block" style="margin-top:10px;">Generar Cuenta</button>
+                <button type="submit" class="btn-pro btn-block" style="margin-top:10px;">Generar Cliente</button>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CREAR REVENDEDOR -->
+    <div id="createResellerModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Crear Revendedor</h3>
+                <button class="btn-close-modal" onclick="closeModal('createResellerModal')">&times;</button>
+            </div>
+            <form onsubmit="handleCreateReseller(event)">
+                <div class="form-group">
+                    <label>Usuario Revendedor</label>
+                    <input type="text" id="newResellerUser" class="form-control" placeholder="Ej: revendedor_juan" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="newResellerEmail" class="form-control" placeholder="revendedor@correo.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="text" id="newResellerPass" class="form-control" placeholder="Ej: pass123" required>
+                </div>
+                <div class="form-group">
+                    <label>Asignar Créditos Iniciales</label>
+                    <input type="number" id="newResellerCredits" class="form-control" min="1" placeholder="Ej: 10" required>
+                </div>
+                <button type="submit" class="btn-pro btn-block" style="margin-top:10px; background: linear-gradient(135deg, #2563eb, #1d4ed8);">Crear Revendedor</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR CORREO -->
+    <div id="editEmailModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Editar Correo</h3>
+                <button class="btn-close-modal" onclick="closeModal('editEmailModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Nuevo Correo Electrónico</label>
+                <input type="email" id="editEmailInput" class="form-control" required>
+            </div>
+            <button class="btn-pro btn-block" onclick="saveEmail()">Guardar Correo</button>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR CONTRASEÑA -->
+    <div id="editPassModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Editar Contraseña</h3>
+                <button class="btn-close-modal" onclick="closeModal('editPassModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Nueva Contraseña</label>
+                <input type="text" id="editPassInput" class="form-control" required>
+            </div>
+            <button class="btn-pro btn-block" onclick="savePassword()">Guardar Contraseña</button>
         </div>
     </div>
 
@@ -409,7 +482,7 @@
             <i class="ph ph-coins" style="font-size: 3.5rem; color: var(--primary-red);"></i>
             <h2 style="font-size: 2.2rem; margin: 10px 0;" id="modalCreditsCount">9999</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem;">Créditos disponibles en tu saldo.</p>
-            <button class="btn-pro btn-block" style="margin-top: 20px;" onclick="alert('Solicitud enviada.')">Comprar Más Créditos</button>
+            <button class="btn-pro btn-block" style="margin-top: 20px;" onclick="alert('Solicitud enviada al administrador principal.')">Comprar Más Créditos</button>
         </div>
     </div>
 
@@ -421,16 +494,15 @@
                 <button class="btn-close-modal" onclick="closeModal('settingsModal')">&times;</button>
             </div>
             <div class="form-group">
-                <label>Nueva Contraseña</label>
+                <label>Nueva Contraseña de Acceso</label>
                 <input type="password" id="changePass" class="form-control" placeholder="Ingresa nueva contraseña">
             </div>
             <button class="btn-pro btn-block" onclick="saveSettings()">Guardar Cambios</button>
         </div>
     </div>
 
-    <!-- AQUÍ ESTÁ TODO EL CÓDIGO JAVASCRIPT INTEGRADO -->
     <script>
-        // Cuentas registradas
+        // Cuentas del Sistema
         const usersDatabase = {
             'admin': { password: 'admin123', role: 'Mayorista' },
             'reseller': { password: 'reseller123', role: 'Revendedor' }
@@ -438,43 +510,111 @@
 
         let activeUser = 'admin';
         let currentCredits = 9999;
+        let currentView = 'clients'; // 'clients' o 'resellers'
+        let selectedIndex = null;
 
+        // Lista de Clientes Finales
         let clientsList = [
-            { user: 'juan_perez', pass: '441029', plan: '1 Mes', status: 'ACTIVO', expires: '27/10/2026' },
-            { user: 'demo_9821', pass: '110293', plan: 'Demo 2Hs', status: 'DEMO', expires: 'Hoy, 19:00 HS' }
+            { user: 'juan_perez', email: 'juan@gmail.com', pass: '441029', plan: '1 Mes', status: 'ACTIVO', expires: '27/10/2026' }
         ];
 
-        // Dibujar clientes en pantalla
+        // Lista de Revendedores
+        let resellersList = [
+            { user: 'revendedor_1', email: 'reventa1@gmail.com', pass: 'pass123', credits: 25, status: 'ACTIVO' }
+        ];
+
+        // Cambiar entre Pestañas (Clientes vs Revendedores)
+        function switchView(view) {
+            currentView = view;
+            document.getElementById('btnTabClients').classList.toggle('active', view === 'clients');
+            document.getElementById('btnTabResellers').classList.toggle('active', view === 'resellers');
+            
+            if (view === 'clients') {
+                document.getElementById('sectionTitle').innerText = 'Gestión de Clientes Finales';
+            } else {
+                document.getElementById('sectionTitle').innerText = 'Gestión de Revendedores';
+            }
+            renderTable();
+        }
+
+        // Renderizar Tablas
         function renderTable() {
             const tbody = document.getElementById('clientsTableBody');
+            const thead = document.getElementById('tableHeaders');
             tbody.innerHTML = '';
 
-            clientsList.forEach((client, index) => {
-                const tr = document.createElement('tr');
-                const isDemo = client.status === 'DEMO';
-                tr.innerHTML = `
-                    <td><strong>${client.user}</strong></td>
-                    <td><code>${client.pass}</code></td>
-                    <td>${client.plan}</td>
-                    <td><span class="status-badge ${isDemo ? 'status-demo' : 'status-active'}">${client.status}</span></td>
-                    <td>${client.expires}</td>
-                    <td>
-                        <div class="action-btns">
-                            <button class="btn-icon" onclick="copyAccount('${client.user}', '${client.pass}')" title="Copiar"><i class="ph ph-copy"></i></button>
-                            <button class="btn-icon" onclick="deleteClient(${index})" title="Eliminar"><i class="ph ph-trash"></i></button>
-                        </div>
-                    </td>
+            if (currentView === 'clients') {
+                thead.innerHTML = `
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Contraseña</th>
+                    <th>Plan</th>
+                    <th>Estado</th>
+                    <th>Vencimiento</th>
+                    <th>Acciones</th>
                 `;
-                tbody.appendChild(tr);
-            });
+
+                clientsList.forEach((client, index) => {
+                    const tr = document.createElement('tr');
+                    const isDemo = client.status === 'DEMO';
+                    tr.innerHTML = `
+                        <td><strong>${client.user}</strong></td>
+                        <td>${client.email}</td>
+                        <td><code>${client.pass}</code></td>
+                        <td>${client.plan}</td>
+                        <td><span class="status-badge ${isDemo ? 'status-demo' : 'status-active'}">${client.status}</span></td>
+                        <td>${client.expires}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-icon" onclick="renewClient(${index})" title="Renovar +1 Mes"><i class="ph ph-arrows-clockwise"></i></button>
+                                <button class="btn-icon" onclick="openEditEmailModal(${index})" title="Editar Correo"><i class="ph ph-envelope-simple"></i></button>
+                                <button class="btn-icon" onclick="openEditPassModal(${index})" title="Editar Clave"><i class="ph ph-key"></i></button>
+                                <button class="btn-icon" onclick="copyAccount('${client.user}', '${client.pass}')" title="Copiar"><i class="ph ph-copy"></i></button>
+                                <button class="btn-icon" onclick="deleteClient(${index})" title="Eliminar"><i class="ph ph-trash"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                thead.innerHTML = `
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Contraseña</th>
+                    <th>Créditos Saldo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                `;
+
+                resellersList.forEach((reseller, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${reseller.user}</strong></td>
+                        <td>${reseller.email}</td>
+                        <td><code>${reseller.pass}</code></td>
+                        <td><strong style="color: var(--primary-red);">${reseller.credits} CR</strong></td>
+                        <td><span class="status-badge status-active">${reseller.status}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-icon" onclick="addCreditsToReseller(${index})" title="Sumar Créditos"><i class="ph ph-plus-circle"></i></button>
+                                <button class="btn-icon" onclick="openEditEmailModal(${index})" title="Editar Correo"><i class="ph ph-envelope-simple"></i></button>
+                                <button class="btn-icon" onclick="openEditPassModal(${index})" title="Editar Clave"><i class="ph ph-key"></i></button>
+                                <button class="btn-icon" onclick="copyAccount('${reseller.user}', '${reseller.pass}')" title="Copiar"><i class="ph ph-copy"></i></button>
+                                <button class="btn-icon" onclick="deleteReseller(${index})" title="Eliminar"><i class="ph ph-trash"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
 
             document.getElementById('statCredits').innerText = currentCredits;
             document.getElementById('modalCreditsCount').innerText = currentCredits;
-            document.getElementById('statActive').innerText = clientsList.filter(c => c.status === 'ACTIVO').length;
-            document.getElementById('statDemos').innerText = clientsList.filter(c => c.status === 'DEMO').length;
+            document.getElementById('statActive').innerText = clientsList.length;
+            document.getElementById('statResellers').innerText = resellersList.length;
         }
 
-        // Ocultar/Ver Contraseña
+        // Toggle Mostrar Contraseña
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const eyeOpen = document.getElementById('eyeOpen');
@@ -491,7 +631,7 @@
             }
         }
 
-        // Proceso de Inicio de Sesión según Rol
+        // Login por Roles
         function handleLogin(event) {
             event.preventDefault();
             const usernameInput = document.getElementById('username').value.trim();
@@ -504,12 +644,11 @@
                 activeUser = usernameInput;
                 const userRole = usersDatabase[usernameInput].role;
 
-                // Asignación de Créditos según el Tipo de Cuenta
-                if (userRole === 'Mayorista') {
-                    currentCredits = 9999; // Créditos para Mayoristas
-                } else {
-                    currentCredits = 50;   // Créditos iniciales para Revendedor
-                }
+                currentCredits = (userRole === 'Mayorista') ? 9999 : 50;
+
+                // Ocultar opciones de Revendedor si ingresa un revendedor común
+                const resellerBtns = document.querySelectorAll('.id-reseller-btn');
+                resellerBtns.forEach(btn => btn.style.display = (userRole === 'Mayorista') ? 'flex' : 'none');
 
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboardScreen').style.display = 'block';
@@ -521,18 +660,18 @@
             }
         }
 
-        // Salir de la Cuenta
+        // Salir
         function logout() {
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('dashboardScreen').style.display = 'none';
             document.getElementById('password').value = '';
         }
 
-        // Control de Ventanas Flotantes
+        // Abrir/Cerrar Modales
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Crear Cliente
+        // Crear Cliente Final
         function handleCreateClient(event) {
             event.preventDefault();
             if (currentCredits < 1) {
@@ -540,14 +679,109 @@
                 return;
             }
             const user = document.getElementById('newUsername').value;
+            const email = document.getElementById('newEmail').value;
             const pass = document.getElementById('newPassword').value;
             const plan = document.getElementById('newPlan').value;
 
-            clientsList.unshift({ user, pass, plan, status: 'ACTIVO', expires: '27/10/2026' });
+            clientsList.unshift({ user, email, pass, plan, status: 'ACTIVO', expires: '27/10/2026' });
             currentCredits -= 1;
             renderTable();
             closeModal('createModal');
             alert(`¡Cliente ${user} creado con éxito!`);
+        }
+
+        // Crear Revendedor
+        function handleCreateReseller(event) {
+            event.preventDefault();
+            const user = document.getElementById('newResellerUser').value;
+            const email = document.getElementById('newResellerEmail').value;
+            const pass = document.getElementById('newResellerPass').value;
+            const creditsToGive = parseInt(document.getElementById('newResellerCredits').value);
+
+            if (creditsToGive > currentCredits) {
+                alert('No tienes suficientes créditos para asignar.');
+                return;
+            }
+
+            resellersList.unshift({ user, email, pass, credits: creditsToGive, status: 'ACTIVO' });
+            currentCredits -= creditsToGive;
+            renderTable();
+            closeModal('createResellerModal');
+            alert(`¡Revendedor ${user} creado con ${creditsToGive} créditos!`);
+        }
+
+        // Sumar Créditos a Revendedor
+        function addCreditsToReseller(index) {
+            const add = prompt(`¿Cuántos créditos deseas añadirle a ${resellersList[index].user}?`);
+            if (add && !isNaN(add) && parseInt(add) > 0) {
+                const amount = parseInt(add);
+                if (amount <= currentCredits) {
+                    resellersList[index].credits += amount;
+                    currentCredits -= amount;
+                    renderTable();
+                    alert('¡Créditos añadidos con éxito!');
+                } else {
+                    alert('No tienes suficientes créditos.');
+                }
+            }
+        }
+
+        // Renovar Cliente
+        function renewClient(index) {
+            if (currentCredits < 1) {
+                alert('No tienes saldo suficiente.');
+                return;
+            }
+            if (confirm(`¿Deseas renovar 1 Mes a ${clientsList[index].user} por 1 Crédito?`)) {
+                currentCredits -= 1;
+                clientsList[index].expires = '27/11/2026';
+                renderTable();
+                alert('¡Cuenta renovada!');
+            }
+        }
+
+        // Editar Correo
+        function openEditEmailModal(index) {
+            selectedIndex = index;
+            const list = (currentView === 'clients') ? clientsList : resellersList;
+            document.getElementById('editEmailInput').value = list[index].email;
+            openModal('editEmailModal');
+        }
+
+        function saveEmail() {
+            const newEmail = document.getElementById('editEmailInput').value;
+            if (newEmail) {
+                if (currentView === 'clients') {
+                    clientsList[selectedIndex].email = newEmail;
+                } else {
+                    resellersList[selectedIndex].email = newEmail;
+                }
+                renderTable();
+                closeModal('editEmailModal');
+                alert('¡Correo actualizado!');
+            }
+        }
+
+        // Editar Contraseña
+        function openEditPassModal(index) {
+            selectedIndex = index;
+            const list = (currentView === 'clients') ? clientsList : resellersList;
+            document.getElementById('editPassInput').value = list[index].pass;
+            openModal('editPassModal');
+        }
+
+        function savePassword() {
+            const newPass = document.getElementById('editPassInput').value;
+            if (newPass) {
+                if (currentView === 'clients') {
+                    clientsList[selectedIndex].pass = newPass;
+                } else {
+                    resellersList[selectedIndex].pass = newPass;
+                }
+                renderTable();
+                closeModal('editPassModal');
+                alert('¡Contraseña actualizada!');
+            }
         }
 
         // Generar Demo Rápido
@@ -556,7 +790,7 @@
             const user = `demo_${randomNum}`;
             const pass = `${Math.floor(100000 + Math.random() * 900000)}`;
 
-            clientsList.unshift({ user, pass, plan: 'Demo 2Hs', status: 'DEMO', expires: 'Hoy, 2 Horas' });
+            clientsList.unshift({ user, email: 'demo@remix.com', pass, plan: 'Demo 2Hs', status: 'DEMO', expires: 'Hoy, 2 Horas' });
             renderTable();
             alert(`¡Demo Creado!\nUsuario: ${user}\nClave: ${pass}`);
         }
@@ -564,10 +798,10 @@
         // Copiar credenciales
         function copyAccount(u, p) {
             navigator.clipboard.writeText(`REMIX PANEL\nUsuario: ${u}\nClave: ${p}`);
-            alert('¡Datos copiados al portapapeles!');
+            alert('¡Datos copiados!');
         }
 
-        // Eliminar Cliente
+        // Eliminar Cliente / Revendedor
         function deleteClient(index) {
             if (confirm('¿Seguro que deseas eliminar esta cuenta?')) {
                 clientsList.splice(index, 1);
@@ -575,12 +809,19 @@
             }
         }
 
-        // Guardar Nueva Contraseña
+        function deleteReseller(index) {
+            if (confirm('¿Seguro que deseas eliminar este revendedor?')) {
+                resellersList.splice(index, 1);
+                renderTable();
+            }
+        }
+
+        // Guardar Contraseña del Perfil
         function saveSettings() {
             const newP = document.getElementById('changePass').value;
             if(newP) {
                 usersDatabase[activeUser].password = newP;
-                alert('¡Contraseña actualizada correctamente!');
+                alert('¡Contraseña actualizada!');
                 closeModal('settingsModal');
             }
         }
